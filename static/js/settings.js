@@ -1,0 +1,3 @@
+settings = {
+    cellSize: 20
+}
