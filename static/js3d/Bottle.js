@@ -4,12 +4,19 @@ class Bottle {
 
     constructor(height, width) {
 
+        this.width = width
+        this.height = height
+
+        this.fields = []
+        let row = []
+
         this.container = new THREE.Object3D
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
                 if (i == height - 1 && j == width / 2 + 2) {
-                    for (let l = i + 1; l < i + 4; l++)
+                    for (let l = i + 1; l < i + 4; l++) {
                         this.container.add(new Frame(l, j))
+                    }
                     this.container.add(new Frame(i + 3, j + 1))
                 }
                 else if (i == height - 1 && j == width / 2 - 3) {

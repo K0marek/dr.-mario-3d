@@ -18,7 +18,7 @@ class Frame extends THREE.Mesh {
         this.posY = posY
         this.allow = false
 
-        return (this)
+        return this
 
     }
 
