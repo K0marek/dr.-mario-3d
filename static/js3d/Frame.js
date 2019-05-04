@@ -7,6 +7,7 @@ class Frame extends THREE.Mesh {
         super()
 
         const { cellSize } = settings
+        //sdvsvsd
 
         this.geometry = new THREE.BoxGeometry(cellSize, cellSize, cellSize, 1, 1, 1)
         this.material = new THREE.MeshBasicMaterial({
