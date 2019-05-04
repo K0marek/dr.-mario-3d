@@ -34,8 +34,6 @@ class Game {
             this.renderer.setSize(window.innerWidth, window.innerHeight)
         })
 
-        this.fields = []
-
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
@@ -44,6 +42,9 @@ class Game {
             new Pill(this.randomColor(), this.randomColor()),
             new Pill(this.randomColor(), this.randomColor())
         ]
+
+        this.pillsContainer = new THREE.Object3D
+        this.scene.add(this.pillsContainer)
 
         this.speed = null // domyślna szybkość spadania pigułki
 
@@ -76,7 +77,7 @@ class Game {
             this.nextPills.push(new Pill(this.randomColor(), this.randomColor()))
 
             this.nextPills.forEach((item, index) => {
-                this.scene.add(item)
+                this.pillsContainer.add(item)
                 item.position.set(150, 200 - index * settings.cellSize, 0)
             })
 
@@ -84,7 +85,6 @@ class Game {
 
             this.pill.position.y = settings.cellSize * 15
             this.pill.position.x = 0
-            this.scene.add(this.pill)
         }
 
         nextPill()

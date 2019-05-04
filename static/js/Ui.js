@@ -9,6 +9,7 @@ class Ui {
         $(document).on('keydown', e => {
             const { pill } = game
             const { cellSize } = settings
+            const { fields } = game.bottle
             switch (e.keyCode) {
                 //Z
                 case 90:
@@ -16,7 +17,7 @@ class Ui {
                     if (pill.positionSet == 0) {
                         pill.rotation.z = Math.PI / 2
                         pill.position.y -= cellSize
-                        if (!game.bottle.fields[pill.children[1].posY][pill.children[1].posX + 1].allow) {
+                        if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
                             pill.position.x -= cellSize
                             pill.children[0].posX--
                             pill.children[0].posY--
@@ -26,13 +27,17 @@ class Ui {
                         }
                     }
                     else if (pill.positionSet == 1) {
-                        pill.rotation.z = Math.PI
-                        pill.children[1].posX--
-                        pill.children[1].posY++
+                        if (fields[pill.children[0].posY + 1][pill.children[0].posX].allow) {
+                            pill.rotation.z = Math.PI
+                            pill.children[1].posX--
+                            pill.children[1].posY++
+                        } else {
+                            pill.positionSet = 0
+                        }
                     }
                     else if (pill.positionSet == 2) {
                         pill.rotation.z = Math.PI * 1.5
-                        if (!game.bottle.fields[pill.children[1].posY][pill.children[1].posX + 1].allow) {
+                        if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
                             pill.children[1].posX--
                             pill.children[1].posY--
                         } else {
@@ -42,12 +47,16 @@ class Ui {
                         }
                     }
                     else if (pill.positionSet == 3) {
-                        pill.positionSet = -1
-                        pill.position.x -= cellSize
-                        pill.position.y += cellSize
-                        pill.rotation.z = 0
-                        pill.children[0].posX--
-                        pill.children[0].posY++
+                        if (fields[pill.children[1].posY + 1][pill.children[1].posX].allow) {
+                            pill.positionSet = -1
+                            pill.position.x -= cellSize
+                            pill.position.y += cellSize
+                            pill.rotation.z = 0
+                            pill.children[0].posX--
+                            pill.children[0].posY++
+                        } else {
+                            pill.positionSet = 2
+                        }
                     }
                     break
                 //LEFT
