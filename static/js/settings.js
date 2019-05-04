@@ -1,4 +1,4 @@
-console.log("wczytano plik Settings.js")
+console.log("wczytano plik Seergergerg.js")
 
 settings = {
     cellSize: 20,
