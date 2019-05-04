@@ -1,3 +1,5 @@
+console.log("wczytano plik Pill.js")
+
 class Pill extends THREE.Object3D {
     constructor(color1, color2) {
 
@@ -26,7 +28,6 @@ class Pill extends THREE.Object3D {
     }
 
     createHalf = (color) => {
-
         const { cellSize } = settings
 
         const container = new THREE.Object3D()
