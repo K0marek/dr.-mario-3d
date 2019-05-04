@@ -4,7 +4,7 @@ class Frame extends THREE.Mesh {
 
     constructor(posY, posX) {
 
-        super() // wywołanie konstruktora klasy, z której dziedziczymy, czyli z Mesha
+        super()
 
         const { cellSize } = settings
 

@@ -1,18 +1,18 @@
+console.log("wczytano plik Ui.js")
+
 class Ui {
 
-    constructor() {
-        console.log('konstruktor klasy Ui')
-    }
+    constructor() { }
 
-    //sterowanie w grze
+    //UTWORZENIE STEROWANIA W GRZE
     controls = () => {
         $(document).on('keydown', e => {
             const { pill } = game
             const { cellSize } = settings
             switch (e.keyCode) {
+                //Z
                 case 90:
                     pill.positionSet++
-                    console.log(pill.positionSet)
                     if (pill.positionSet == 0) {
                         pill.position.y -= cellSize
                         pill.rotation.z = Math.PI / 2
@@ -39,6 +39,7 @@ class Ui {
                         pill.children[0].posY++
                     }
                     break
+                //LEFT
                 case 37:
                     if (game.checkPossibility('-')) {
                         pill.position.x -= 20
@@ -47,6 +48,7 @@ class Ui {
                         })
                     }
                     break
+                //RIGHT
                 case 39:
                     if (game.checkPossibility('+')) {
                         pill.position.x += 20
@@ -55,6 +57,7 @@ class Ui {
                         })
                     }
                     break
+                //DOWN
                 case 40:
                     game.speed = settings.defaultSpeed / 20
                     break
@@ -76,5 +79,5 @@ class Ui {
         })
     }
 
-    //usunięcie sterowania po wygranej
+    //USUNIĘCIE STEROWANIA W GRZE
 }

@@ -1,3 +1,5 @@
+console.log("wczytano plik Game.js")
+
 class Game {
 
     constructor() {
@@ -48,12 +50,12 @@ class Game {
         ui.interface()
 
         this.render()
+
     }
 
     render() {
 
         requestAnimationFrame(this.render.bind(this))
-
         this.renderer.render(this.scene, this.camera)
 
     }
@@ -65,7 +67,6 @@ class Game {
     }
 
     play = (speed) => {
-
         this.speed = speed
 
         const nextPill = () => {
@@ -84,7 +85,6 @@ class Game {
             this.pill.position.y = settings.cellSize * 16
             this.pill.position.x = 0
             this.scene.add(this.pill)
-
         }
 
         nextPill()
@@ -117,7 +117,6 @@ class Game {
             }, this.speed)
         }
         fall()
-
     }
 
     checkPossibility = (sign) => {
