@@ -34,8 +34,6 @@ class Game {
             this.renderer.setSize(window.innerWidth, window.innerHeight)
         })
 
-        this.fields = []
-
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
@@ -44,6 +42,9 @@ class Game {
             new Pill(this.randomColor(), this.randomColor()),
             new Pill(this.randomColor(), this.randomColor())
         ]
+
+        this.pillsContainer = new THREE.Object3D
+        this.scene.add(this.pillsContainer)
 
         this.speed = null // domyślna szybkość spadania pigułki
 
@@ -76,7 +77,7 @@ class Game {
             this.nextPills.push(new Pill(this.randomColor(), this.randomColor()))
 
             this.nextPills.forEach((item, index) => {
-                this.scene.add(item)
+                this.pillsContainer.add(item)
                 item.position.set(150, 200 - index * settings.cellSize, 0)
             })
 
@@ -84,7 +85,6 @@ class Game {
 
             this.pill.position.y = settings.cellSize * 16
             this.pill.position.x = 0
-            this.scene.add(this.pill)
         }
 
         nextPill()
@@ -95,9 +95,8 @@ class Game {
             setTimeout(() => {
                 let end = false
                 this.pill.children.forEach(half => {
-                    half.posY--
                     this.bottle.children.forEach(field => {
-                        if (field.posX == half.posX && field.posY == half.posY)
+                        if (field.posX == half.posX && field.posY == half.posY - 1)
                             if (!field.allow)
                                 end = true
                     })
@@ -105,14 +104,21 @@ class Game {
                 if (end) {
                     this.pill.children.forEach(half => {
                         this.bottle.children.forEach(field => {
-                            if (field.posX == half.posX && field.posY == half.posY + 1)
+                            if (field.posX == half.posX && field.posY == half.posY)
                                 field.allow = false
                         })
+                        this.checkRow(half.posY, half.posX)
                     })
+                    // checkColumn()
+                    console.log(this.scene.children)
                     nextPill()
                 }
-                else
+                else {
+                    this.pill.children.forEach(half => {
+                        half.posY--
+                    })
                     this.pill.position.y -= 20
+                }
                 fall()
             }, this.speed)
         }
@@ -149,6 +155,10 @@ class Game {
             })
         }
         return agree
+    }
+
+    checkRow = (posY, posX) => {
+        console.log(posY, posX)
     }
 
 }
