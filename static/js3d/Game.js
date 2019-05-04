@@ -104,10 +104,10 @@ class Game {
                             if (field.posX == half.posX && field.posY == half.posY)
                                 field.allow = false
                         })
-                        this.checkRow(half.posY, half.posX)
+                        this.checkRow(half)
                     })
                     // checkColumn()
-                    console.log(this.scene.children)
+                    this.speed = settings.defaultSpeed
                     nextPill()
                 }
                 else {
@@ -154,8 +154,8 @@ class Game {
         return agree
     }
 
-    checkRow = (posY, posX) => {
-        console.log(posY, posX)
+    checkRow = (half) => {
+        console.log(half.color)
     }
 
 }

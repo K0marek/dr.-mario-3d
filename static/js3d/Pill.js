@@ -5,17 +5,17 @@ class Pill extends THREE.Object3D {
 
         super()
 
-        this.color1 = color1
-        this.color2 = color2
+        // this.color1 = color1
+        // this.color2 = color2
         this.positionSet = 0
 
         const { cellSize } = settings
 
-        let half1 = this.createHalf(this.color1)
+        let half1 = this.createHalf(color1)
         half1.posX = 4
         half1.posY = 16
         this.add(half1)
-        let half2 = this.createHalf(this.color2)
+        let half2 = this.createHalf(color2)
         half2.posX = 5
         half2.posY = 16
         half2.rotation.z = Math.PI
@@ -31,6 +31,7 @@ class Pill extends THREE.Object3D {
         const { cellSize } = settings
 
         const container = new THREE.Object3D()
+        container.color = color
         const cylinderGeometry = new THREE.CylinderGeometry(cellSize / 2, cellSize / 2, cellSize / 2, 32)
         const material = new THREE.MeshBasicMaterial({
             color
