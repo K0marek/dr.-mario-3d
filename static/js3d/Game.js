@@ -97,13 +97,14 @@ class Game {
                 let end = false
                 this.pill.children.forEach(half => {
                     half.posY--
+                    console.log(half.posY)
                     if (!fields[half.posY][half.posX].allow)
                         end = true
                 })
                 if (end) {
                     this.pill.children.forEach(half => {
                         this.bottle.children.forEach(field => {
-                            if (field.posX == half.posX && field.posY == half.posY + 1)
+                            if (field.posX == half.posX && field.posY == half.posY)
                                 field.allow = false
                         })
                     })

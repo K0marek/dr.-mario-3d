@@ -6,9 +6,6 @@ class Bottle extends THREE.Object3D {
 
         super()
 
-        this.width = width
-        this.height = height
-
         this.fields = []
 
         for (let i = 0; i < height; i++) {
