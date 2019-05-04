@@ -22,9 +22,6 @@ class Game {
         this.axes = new THREE.AxesHelper(1000)
         this.scene.add(this.axes)
 
-        this.raycaster = new THREE.Raycaster()
-        this.mouseVector = new THREE.Vector2()
-
         this.camera.position.set(0, 100, 600)
         this.camera.lookAt(this.scene.position.x, this.scene.position.x + 150, this.scene.position.z)
 
@@ -43,7 +40,7 @@ class Game {
             new Pill(this.randomColor(), this.randomColor())
         ]
 
-        this.pillsContainer = new THREE.Object3D
+        this.pillsContainer = new PillsContainer()
         this.scene.add(this.pillsContainer)
 
         this.speed = null // domyślna szybkość spadania pigułki
