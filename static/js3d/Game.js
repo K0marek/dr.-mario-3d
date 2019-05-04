@@ -80,7 +80,7 @@ class Game {
 
             this.nextPills.shift()
 
-            this.pill.position.y = settings.cellSize * 16
+            this.pill.position.y = settings.cellSize * 15
             this.pill.position.x = 0
         }
 
@@ -90,13 +90,11 @@ class Game {
 
         const fall = () => {
             setTimeout(() => {
+                const { fields } = this.bottle
                 let end = false
                 this.pill.children.forEach(half => {
-                    this.bottle.children.forEach(field => {
-                        if (field.posX == half.posX && field.posY == half.posY - 1)
-                            if (!field.allow)
-                                end = true
-                    })
+                    if (!fields[half.posY - 1][half.posX].allow)
+                        end = true
                 })
                 if (end) {
                     this.pill.children.forEach(half => {
@@ -106,9 +104,8 @@ class Game {
                         })
                         this.checkRow(half)
                     })
-                    // checkColumn()
-                    this.speed = settings.defaultSpeed
                     nextPill()
+                    this.speed = settings.defaultSpeed
                 }
                 else {
                     this.pill.children.forEach(half => {
