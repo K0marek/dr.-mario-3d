@@ -96,11 +96,12 @@ class Game {
                 const { fields } = this.bottle
                 let end = false
                 this.pill.children.forEach(half => {
-                  
+
                     half.posY--
+                    console.log(fields[half.posY][half.posX])
                     if (!fields[half.posY][half.posX].allow)
                         end = true
-                  
+
                 })
                 if (end) {
                     this.pill.children.forEach(half => {
@@ -110,8 +111,6 @@ class Game {
                         })
                         this.checkRow(half.posY, half.posX)
                     })
-                    // checkColumn()
-                    console.log(this.scene.children)
                     nextPill()
                 }
                 else {
@@ -158,8 +157,8 @@ class Game {
         return agree
     }
 
-    checkRow = (posY, posX) => {
-        console.log(posY, posX)
-    }
+    // checkRow = (posY, posX) => {
+    //     console.log(posY, posX)
+    // }
 
 }
