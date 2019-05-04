@@ -73,6 +73,7 @@ class Ui {
         })
     }
 
+    //OBSŁUGA KLIKNIĘĆ
     interface = () => {
         $('#playButton').on('click', () => {
             game.play(settings.defaultSpeed)
