@@ -104,7 +104,7 @@ class Game {
                 if (end) {
                     this.pill.children.forEach(half => {
                         this.bottle.children.forEach(field => {
-                            if (field.posX == half.posX && field.posY == half.posY)
+                            if (field.posX == half.posX && field.posY == half.posY + 1)
                                 field.allow = false
                         })
                     })
