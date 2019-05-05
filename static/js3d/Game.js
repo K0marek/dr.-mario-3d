@@ -59,8 +59,12 @@ class Game {
     }
 
     randomColor = () => {
-        let colors = [0xff0000, 0x0000ff, 0xffff00]
-        let random = Math.floor(Math.random() * 3)
+        // let colors = [0xff0000]
+        // let random = Math.floor(Math.random() * 1)
+        let colors = [0xff0000, 0x0000ff]
+        let random = Math.floor(Math.random() * 2)
+        // let colors = [0xff0000, 0x0000ff, 0xffff00]
+        // let random = Math.floor(Math.random() * 3)
         return colors[random]
     }
 
@@ -99,11 +103,20 @@ class Game {
                 if (end) {
                     this.pill.children.forEach(half => {
                         this.bottle.children.forEach(field => {
-                            if (field.posX == half.posX && field.posY == half.posY)
+                            if (field.posX == half.posX && field.posY == half.posY) {
                                 field.allow = false
+                                field.color = half.color
+                            }
                         })
-                        this.checkRow(half)
                     })
+                    if (this.pill.children[0].color != this.pill.children[1].color) {
+                        for (let i = this.pill.children.length - 1; i >= 0; i--) {
+                            this.checkRow(this.pill.children[i])
+                            // this.checkColumn(this.pill.children[i])
+                        }
+                    }
+                    else
+                        this.checkRow(this.pill.children[0])
                     nextPill()
                     this.speed = settings.defaultSpeed
                 }
@@ -152,7 +165,29 @@ class Game {
     }
 
     checkRow = (half) => {
-        console.log(half.color)
+        let remember = []
+        this.bottle.fields[half.posY].forEach(element => {
+            if (remember.length < 4 && element.color == half.color)
+                remember.push(element)
+            else if (remember.length < 4)
+                remember = []
+            else if (remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
+                remember.push(element)
+        })
+        if (remember.length > 3) {
+            remember.forEach(element => {
+                this.scene.children[2].children.forEach(pill => {
+                    pill.children.forEach((pillHalf, index) => {
+                        if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
+                            if (index == 0)
+                                pill.children.shift()
+                            else
+                                pill.children.pop()
+                        }
+                    })
+                })
+            })
+        }
     }
 
 }
