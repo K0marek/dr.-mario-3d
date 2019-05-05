@@ -22,9 +22,6 @@ class Game {
         this.axes = new THREE.AxesHelper(1000)
         this.scene.add(this.axes)
 
-        this.raycaster = new THREE.Raycaster()
-        this.mouseVector = new THREE.Vector2()
-
         this.camera.position.set(0, 100, 600)
         this.camera.lookAt(this.scene.position.x, this.scene.position.x + 150, this.scene.position.z)
 
@@ -43,7 +40,7 @@ class Game {
             new Pill(this.randomColor(), this.randomColor())
         ]
 
-        this.pillsContainer = new THREE.Object3D
+        this.pillsContainer = new PillsContainer()
         this.scene.add(this.pillsContainer)
 
         this.speed = null // domyślna szybkość spadania pigułki
@@ -96,22 +93,26 @@ class Game {
                 const { fields } = this.bottle
                 let end = false
                 this.pill.children.forEach(half => {
-                    half.posY--
-                    console.log(half.posY)
-                    if (!fields[half.posY][half.posX].allow)
+                    if (!fields[half.posY - 1][half.posX].allow)
                         end = true
                 })
                 if (end) {
                     this.pill.children.forEach(half => {
                         this.bottle.children.forEach(field => {
-                            if (field.posX == half.posX && field.posY == half.posY + 1)
+                            if (field.posX == half.posX && field.posY == half.posY)
                                 field.allow = false
                         })
+                        this.checkRow(half)
                     })
                     nextPill()
+                    this.speed = settings.defaultSpeed
                 }
-                else
+                else {
+                    this.pill.children.forEach(half => {
+                        half.posY--
+                    })
                     this.pill.position.y -= 20
+                }
                 fall()
             }, this.speed)
         }
@@ -148,6 +149,10 @@ class Game {
             })
         }
         return agree
+    }
+
+    checkRow = (half) => {
+        console.log(half.color)
     }
 
 }
