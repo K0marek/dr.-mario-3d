@@ -36,11 +36,15 @@ class Ui {
                         }
                     }
                     else if (pill.positionSet == 2) {
-                        pill.rotation.z = Math.PI * 1.5
                         if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
-                            pill.children[1].posX--
-                            pill.children[1].posY--
+                            if (fields[pill.children[1].posY - 1][pill.children[1].posX - 1].allow) {
+                                pill.rotation.z = Math.PI * 1.5
+                                pill.children[1].posX--
+                                pill.children[1].posY--
+                            } else
+                                pill.positionSet = 1
                         } else {
+                            pill.rotation.z = Math.PI * 1.5
                             pill.position.x += cellSize
                             pill.children[0].posX++
                             pill.children[1].posY--
