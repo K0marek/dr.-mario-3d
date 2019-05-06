@@ -21,6 +21,7 @@ class Field extends THREE.Object3D {
         this.posX = posX
         this.posY = posY
         this.allow = true
+        this.color = "nothing"
 
         return this
 
