@@ -130,6 +130,7 @@ class Game {
                                     })
                                 })
                             })
+                            this.checkRest()
                         }
                     })
                     nextPill()
@@ -204,6 +205,18 @@ class Game {
             }
         })
         return remember
+    }
+
+    checkRest() {
+        let remember = []
+        this.scene.children[2].children.forEach((pill, index) => {
+            if (index < this.scene.children[2].children.length - 3)
+                pill.children.forEach(pillHalf => {
+                    if (this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow)
+                        remember.push(pillHalf)
+                })
+        })
+        console.log(remember)
     }
 
 }
