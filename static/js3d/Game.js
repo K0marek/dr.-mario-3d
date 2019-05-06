@@ -110,7 +110,7 @@ class Game {
                         })
                     })
                     let obj = []
-                    for (let i = 0; i < this.pill.children.length; i--) {
+                    for (let i = 0; i < this.pill.children.length; i++) {
                         obj.push(this.checkRow(this.pill.children[i]))
                         obj.push(this.checkColumn(this.pill.children[i]))
                     }
@@ -190,26 +190,6 @@ class Game {
                 remember.push(element)
         })
         return remember
-        // if (remember.length > 3) {
-        //     remember.forEach(element => {
-        //         this.scene.children[1].children.forEach(field => {
-        //             if (field.posX == element.posX && field.posY == element.posY) {
-        //                 field.allow = true
-        //                 field.color = "nothing"
-        //             }
-        //         })
-        //         this.scene.children[2].children.forEach(pill => {
-        //             pill.children.forEach((pillHalf, index) => {
-        //                 if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
-        //                     if (index == 0)
-        //                         pill.children.shift()
-        //                     else
-        //                         pill.children.pop()
-        //                 }
-        //             })
-        //         })
-        //     })
-        // }
     }
 
     checkColumn = (half) => {
@@ -224,26 +204,6 @@ class Game {
             }
         })
         return remember
-        // if (remember.length > 3) {
-        //     remember.forEach(element => {
-        //         this.scene.children[1].children.forEach(field => {
-        //             if (field.posX == element.posX && field.posY == element.posY) {
-        //                 field.allow = true
-        //                 field.color = "nothing"
-        //             }
-        //         })
-        //         this.scene.children[2].children.forEach(pill => {
-        //             pill.children.forEach((pillHalf, index) => {
-        //                 if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
-        //                     if (index == 0)
-        //                         pill.children.shift()
-        //                     else
-        //                         pill.children.pop()
-        //                 }
-        //             })
-        //         })
-        //     })
-        // }
     }
 
 }
