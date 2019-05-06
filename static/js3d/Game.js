@@ -109,14 +109,29 @@ class Game {
                             }
                         })
                     })
-                    if (this.pill.children[0].color != this.pill.children[1].color) {
-                        for (let i = this.pill.children.length - 1; i >= 0; i--) {
-                            this.checkRow(this.pill.children[i])
-                            // this.checkColumn(this.pill.children[i])
-                        }
+                    let obj = []
+                    for (let i = 0; i < this.pill.children.length; i--) {
+                        obj.push(this.checkRow(this.pill.children[i]))
+                        obj.push(this.checkColumn(this.pill.children[i]))
                     }
-                    else
-                        this.checkRow(this.pill.children[0])
+                    obj.forEach(element => {
+                        if (element.length > 3) {
+                            element.forEach(field => {
+                                field.allow = true
+                                field.color = "nothing"
+                                this.scene.children[2].children.forEach(pill => {
+                                    pill.children.forEach((pillHalf, index) => {
+                                        if (pillHalf.posX == field.posX && pillHalf.posY == field.posY) {
+                                            if (index == 0)
+                                                pill.children.shift()
+                                            else
+                                                pill.children.pop()
+                                        }
+                                    })
+                                })
+                            })
+                        }
+                    })
                     nextPill()
                     this.speed = settings.defaultSpeed
                 }
@@ -174,20 +189,61 @@ class Game {
             else if (remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
                 remember.push(element)
         })
-        if (remember.length > 3) {
-            remember.forEach(element => {
-                this.scene.children[2].children.forEach(pill => {
-                    pill.children.forEach((pillHalf, index) => {
-                        if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
-                            if (index == 0)
-                                pill.children.shift()
-                            else
-                                pill.children.pop()
-                        }
-                    })
-                })
-            })
-        }
+        return remember
+        // if (remember.length > 3) {
+        //     remember.forEach(element => {
+        //         this.scene.children[1].children.forEach(field => {
+        //             if (field.posX == element.posX && field.posY == element.posY) {
+        //                 field.allow = true
+        //                 field.color = "nothing"
+        //             }
+        //         })
+        //         this.scene.children[2].children.forEach(pill => {
+        //             pill.children.forEach((pillHalf, index) => {
+        //                 if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
+        //                     if (index == 0)
+        //                         pill.children.shift()
+        //                     else
+        //                         pill.children.pop()
+        //                 }
+        //             })
+        //         })
+        //     })
+        // }
+    }
+
+    checkColumn = (half) => {
+        let remember = []
+        this.bottle.fields.forEach(element => {
+            if (remember.length < 4 && element[half.posX].color == half.color)
+                remember.push(element[half.posX])
+            else if (remember.length < 4)
+                remember = []
+            else if (remember.length >= 4 && element[half.posX].color == half.color && element[half.posX].posY == remember[remember.length - 1].posY + 1) {
+                remember.push(element[half.posX])
+            }
+        })
+        return remember
+        // if (remember.length > 3) {
+        //     remember.forEach(element => {
+        //         this.scene.children[1].children.forEach(field => {
+        //             if (field.posX == element.posX && field.posY == element.posY) {
+        //                 field.allow = true
+        //                 field.color = "nothing"
+        //             }
+        //         })
+        //         this.scene.children[2].children.forEach(pill => {
+        //             pill.children.forEach((pillHalf, index) => {
+        //                 if (pillHalf.posX == element.posX && pillHalf.posY == element.posY) {
+        //                     if (index == 0)
+        //                         pill.children.shift()
+        //                     else
+        //                         pill.children.pop()
+        //                 }
+        //             })
+        //         })
+        //     })
+        // }
     }
 
 }
