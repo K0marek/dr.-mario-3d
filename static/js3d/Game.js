@@ -174,15 +174,21 @@ class Game {
                                 if (whereToStart != 15) {
                                     for (let i = whereToStart; i < 15; i++)
                                         this.analyzeNextRow(i, pillsToFall)
-                                    let interval = setInterval(() => {
-                                        pillsToFall.forEach(pill => {
-
-
-                                            //TU SPADANIE WSZYSTKICH PILL'I
-
-
+                                    console.log(pillsToFall)
+                                    pillsToFall.forEach(pill => {
+                                        pill.children.forEach(pillHalf => {
+                                            console.log(pillHalf.posY, pillHalf.posX)
                                         })
-                                    }, 500)
+                                    })
+                                    // let interval = setInterval(() => {
+                                    //     pillsToFall.forEach(pill => {
+
+
+                                    //         //TU SPADANIE WSZYSTKICH PILL'I
+
+
+                                    //     })
+                                    // }, 500)
                                 }
                             }
                         }
