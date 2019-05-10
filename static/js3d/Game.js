@@ -25,6 +25,11 @@ class Game {
         this.camera.position.set(0, 100, 600)
         this.camera.lookAt(this.scene.position.x, this.scene.position.x + 150, this.scene.position.z)
 
+        // var orbitControl = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        // orbitControl.addEventListener('change', () => {
+        //     this.renderer.render(this.scene, this.camera)
+        // })
+
         $(window).on("resize", () => {
             this.camera.aspect = window.innerWidth / window.innerHeight
             this.camera.updateProjectionMatrix()
@@ -33,6 +38,33 @@ class Game {
 
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
+
+        this.action = {
+            xd: null
+        }
+
+        var loader = new THREE.JSONLoader()
+
+        loader.load('models/mario.json', (geometry, materials) => {
+
+            materials.forEach(material => {
+                material.skinning = true
+            })
+
+            var object = new THREE.SkinnedMesh(geometry, materials)
+
+            object.position.y = 200
+            object.position.x = 200
+            object.scale.set(20, 20, 20)
+
+            this.mixer = new THREE.AnimationMixer(object)
+            this.mixer.clipAction(geometry.animations[2]).play()
+
+            this.scene.add(object)
+
+        })
+
+        this.clock = new THREE.Clock()
 
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
@@ -43,6 +75,9 @@ class Game {
         this.pillsContainer = new PillsContainer()
         this.scene.add(this.pillsContainer)
 
+        var light = new Light()
+        this.scene.add(light.container)
+
         this.speed = null // domyślna szybkość spadania pigułki
 
         ui.interface()
@@ -52,6 +87,9 @@ class Game {
     }
 
     render() {
+
+        var delta = this.clock.getDelta()
+        if (this.mixer) this.mixer.update(delta)
 
         requestAnimationFrame(this.render.bind(this))
         this.renderer.render(this.scene, this.camera)
@@ -148,6 +186,7 @@ class Game {
     }
 
     checkPossibility = (sign) => {
+        const { fields } = this.bottle
         let agree = null
         let x = null
         let y = null
@@ -160,21 +199,24 @@ class Game {
         else
             y = this.pill.children[1].posY
         if (sign == '-') {
-            this.bottle.children.forEach(field => {
-                if (field.posX == x - 1 && field.posY == y)
-                    agree = field.allow
-            })
+            if (this.pill.positionSet % 2 == 0)
+                agree = fields[y][x - 1].allow
+            else {
+                if (fields[y][x - 1].allow && fields[y - 1][x - 1].allow)
+                    agree = true
+                else
+                    agree = false
+            }
         }
         else if (sign == '+') {
-            this.bottle.children.forEach(field => {
-                if (this.pill.positionSet % 2 == 0) {
-                    if (field.posX == x + 2 && field.posY == y)
-                        agree = field.allow
-                }
+            if (this.pill.positionSet % 2 == 0)
+                agree = fields[y][x + 2].allow
+            else {
+                if (fields[y][x + 1].allow && fields[y - 1][x + 1].allow)
+                    agree = true
                 else
-                    if (field.posX == x + 1 && field.posY == y)
-                        agree = field.allow
-            })
+                    agree = false
+            }
         }
         return agree
     }
