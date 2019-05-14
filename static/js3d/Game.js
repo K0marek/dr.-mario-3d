@@ -53,12 +53,15 @@ class Game {
 
             var object = new THREE.SkinnedMesh(geometry, materials)
 
-            object.position.y = 200
-            object.position.x = 200
+            object.position.y = 115
+            object.position.x = 220
             object.scale.set(20, 20, 20)
 
             this.mixer = new THREE.AnimationMixer(object)
-            this.mixer.clipAction(geometry.animations[2]).play()
+
+            var animation = this.mixer.clipAction(geometry.animations[4])
+            animation.setLoop(THREE.LoopOnce)
+            animation.play()
 
             this.scene.add(object)
 
