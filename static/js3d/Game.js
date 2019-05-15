@@ -25,11 +25,6 @@ class Game {
         this.camera.position.set(0, 100, 600)
         this.camera.lookAt(this.scene.position.x, this.scene.position.x + 150, this.scene.position.z)
 
-        // var orbitControl = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        // orbitControl.addEventListener('change', () => {
-        //     this.renderer.render(this.scene, this.camera)
-        // })
-
         $(window).on("resize", () => {
             this.camera.aspect = window.innerWidth / window.innerHeight
             this.camera.updateProjectionMatrix()
@@ -39,35 +34,6 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
-        this.action = {
-            xd: null
-        }
-
-        var loader = new THREE.JSONLoader()
-
-        loader.load('models/mario.json', (geometry, materials) => {
-
-            materials.forEach(material => {
-                material.skinning = true
-            })
-
-            var object = new THREE.SkinnedMesh(geometry, materials)
-
-            object.position.y = 115
-            object.position.x = 220
-            object.scale.set(20, 20, 20)
-
-            this.mixer = new THREE.AnimationMixer(object)
-
-            var animation = this.mixer.clipAction(geometry.animations[4])
-            animation.setLoop(THREE.LoopOnce)
-            animation.play()
-
-            this.scene.add(object)
-
-        })
-
-        this.clock = new THREE.Clock()
 
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
@@ -78,9 +44,6 @@ class Game {
         this.pillsContainer = new PillsContainer()
         this.scene.add(this.pillsContainer)
 
-        var light = new Light()
-        this.scene.add(light.container)
-
         this.speed = null // domyślna szybkość spadania pigułki
 
         ui.interface()
@@ -90,9 +53,6 @@ class Game {
     }
 
     render() {
-
-        var delta = this.clock.getDelta()
-        if (this.mixer) this.mixer.update(delta)
 
         requestAnimationFrame(this.render.bind(this))
         this.renderer.render(this.scene, this.camera)
@@ -111,6 +71,7 @@ class Game {
 
     play = (speed) => {
         this.speed = speed
+        this.pillsToFall = []
 
         const nextPill = () => {
 
@@ -142,169 +103,7 @@ class Game {
                         end = true
                 })
                 if(end) {
-                    this.pill.children.forEach(half => {
-                        this.bottle.children.forEach(field => {
-                            if(field.posX == half.posX && field.posY == half.posY) {
-                                field.allow = false
-                                field.color = half.color
-                            }
-                        })
-                    })
-                    let toDelete = []
-                    for(let i = 0; i < this.pill.children.length; i++) {
-                        toDelete.push(this.checkRow(this.pill.children[i]))
-                        toDelete.push(this.checkColumn(this.pill.children[i]))
-                    }
-                    console.log(toDelete)
-                    let pillsToFall = []
-                    toDelete.forEach(el => {
-                        if(el.length > 3) {
-                            let remember = []
-                            el.forEach((field, indexEl) => {
-                                field.allow = true
-                                field.color = "nothing"
-                                this.scene.children[2].children.forEach(pill => {
-                                    // let isDeleted = false
-                                    pill.children.forEach((pillHalf, indexPillHalf) => {
-                                        if(pillHalf.posX == field.posX && pillHalf.posY == field.posY) {
-                                            let obj = {
-                                                posY: field.posY,
-                                                posX: field.posX
-                                            }
-                                            remember.push(obj)
-                                            if(pill.children.length == 2) {
-                                                if(!this.maybePushed(pillsToFall
-                                                    , pill) && pill.children[(indexPillHalf + 1) % 2].posY == pillHalf.posY)
-                                                    pillsToFall.push(pill)
-                                            }
-                                            else
-                                                pillsToFall.push(pill)
-                                            if(indexPillHalf == 0)
-                                                pill.children.shift()
-                                            else
-                                                pill.children.pop()
-                                            // isDeleted = true
-                                        }
-                                    })
-                                    // if((indexEl == 0 || indexEl == el.length
-                                    //     - 1)&&isDeleted&&pill.children.length==1) {
-                                    //                         if(!this.checkUnderEmpty(obj))
-                                    //                             pillsToFall.push(pill)
-                                    // }
-                                })
-                            })
-                            for(let i = pillsToFall.length - 1; i >= 0; i--) {
-                                if(pillsToFall[i].children.length == 0)
-                                    pillsToFall.splice(i, 1)
-                            }
-                            // let pillsToFall = []
-                            remember.forEach((element, indexElement) => {
-                                if(element.posY != 15 && !this.bottle.fields[element.posY + 1][element.posX].allow) {
-                                    this.scene.children[2].children.forEach(pill => {
-                                        pill.children.forEach((pillHalf, indexPillHalf) => {
-                                            // if(pillHalf.posY == this.bottle.fields[element.posY + 1][element.posX].posY && pillHalf.posX == this.bottle.fields[element.posY + 1][element.posX].posX) {
-                                            if(pillHalf.posY == element.posY + 1 && pillHalf.posX == element.posX) {
-                                                if(pill.children.length == 2) {
-                                                    if(pill.children[(indexPillHalf + 1) % 2].posX == pillHalf.posX)
-                                                        pillsToFall.push(pill)
-                                                    else {
-                                                        if(!this.maybePushed(pillsToFall, pill)) {
-                                                            let obj = {
-                                                                posY: pill.children[(indexPillHalf + 1) % 2].posY,
-                                                                posX: pill.children[(indexPillHalf + 1) % 2].posX
-                                                            }
-                                                            if(!this.checkUnderEmpty(obj))
-                                                                pillsToFall.push(pill)
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                    pillsToFall.push(pill)
-                                            }
-                                            // if(indexElement == 0 || indexElement == remember.length - 1) {
-
-                                            // }
-
-                                            //DRUGI WARUNEK SPRAWDZAJACY CZY OBOK JEST CZĘŚĆ DO SPADANIA
-
-                                        })
-                                    })
-                                }
-                            })
-                            // console.log(pillsToFall)
-                            if(pillsToFall.length > 0) {
-                                let whereToStart = 15
-                                pillsToFall.forEach(pill => {
-                                    pill.children.forEach(pillHalf => {
-                                        if(pillHalf.posY < whereToStart)
-                                            whereToStart = pillHalf.posY
-                                    })
-                                })
-                                if(whereToStart != 15) {
-                                    for(let i = whereToStart; i < 15; i++)
-                                        this.analyzeNextRow(i, pillsToFall)
-                                    console.log(pillsToFall)
-                                    pillsToFall.forEach(pill => {
-                                        pill.children.forEach(pillHalf => {
-                                            // console.log(pillHalf.posY, pillHalf.posX)
-                                            this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = true
-                                            this.bottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
-                                        })
-                                    })
-                                    // pillsToFall.forEach(pill => {
-                                    //     pill.children.forEach(pillHalf => {
-                                    //         this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = true
-                                    //     })
-                                    // })
-                                    if(pillsToFall.length > 0) {
-                                        let interval = setInterval(() => {
-                                            if(pillsToFall.length > 0) {
-                                                let pillsToDelete = []
-                                                pillsToFall.forEach(pillToFall => {
-                                                    pillToFall.children.forEach((pillHalf, index) => {
-                                                        if(!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
-                                                            let isToPush = true
-                                                            pillsToDelete.forEach(pillToDelete => {
-                                                                if(pillToDelete.uuid == pillToFall.uuid)
-                                                                    isToPush = false
-                                                            })
-                                                            if(isToPush) {
-                                                                pillsToDelete.push(pillToFall)
-                                                                this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
-                                                                if(pillToFall.children.length == 2)
-                                                                    this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
-                                                            }
-                                                        }
-                                                    })
-                                                })
-                                                pillsToDelete.forEach(pillToDelete => {
-                                                    pillToDelete.children.forEach(pillHalf => {
-                                                        this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
-                                                        this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
-                                                    })
-                                                    for(let i = pillsToFall.length - 1; i >= 0; i--) {
-                                                        if(pillToDelete.uuid == pillsToFall[i].uuid)
-                                                            pillsToFall.splice(i, 1)
-                                                    }
-                                                })
-                                                pillsToFall.forEach(pillToFall => {
-                                                    pillToFall.children.forEach(pillHalf => {
-                                                        pillHalf.posY--
-                                                    })
-                                                    pillToFall.position.y -= 20
-                                                })
-                                            }
-                                            else {
-                                                clearInterval(interval)
-                                                // nextPill()
-                                                // this.speed = settings.defaultSpeed
-                                            }
-                                        }, 500)
-                                    }
-                                }
-                            }
-                        }
-                    })
+                    falling(this.pill)
                     nextPill()
                     this.speed = settings.defaultSpeed
                 }
@@ -314,14 +113,119 @@ class Game {
                     })
                     this.pill.position.y -= 20
                 }
-                fall()
+                if(this.pillsToFall.length == 0)
+                    fall()
+                else {
+                    let interval = setInterval(() => {
+                        if(this.pillsToFall.length == 0) {
+                            clearInterval(interval)
+                            fall()
+                        }
+                    }, settings.defaultSpeed)
+                }
             }, this.speed)
         }
+
         fall()
+
+        const falling = (pill) => {
+            pill.children.forEach(half => {
+                this.bottle.children.forEach(field => {
+                    if(field.posX == half.posX && field.posY == half.posY) {
+                        field.allow = false
+                        field.color = half.color
+                    }
+                })
+            })
+            let toDelete = []
+            for(let i = 0; i < pill.children.length; i++) {
+                this.checkRow(pill.children[i]).forEach(field => {
+                    if(!this.maybePushed(toDelete, field))
+                        toDelete.push(field)
+                })
+                this.checkColumn(pill.children[i]).forEach(field => {
+                    if(!this.maybePushed(toDelete, field))
+                        toDelete.push(field)
+                })
+            }
+            let whereToStart = 15
+            toDelete.forEach(field => {
+                field.allow = true
+                field.color = "nothing"
+                this.scene.children[2].children.forEach(pill => {
+                    pill.children.forEach(pillHalf => {
+                        if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                            if(!this.maybePushed(this.pillsToFall, pill)) {
+                                this.pillsToFall.push(pill)
+                                if(field.posY < whereToStart)
+                                    whereToStart = field.posY
+                            }
+                        }
+                    })
+                })
+            })
+            if(this.pillsToFall.length > 0) {
+                if(whereToStart != 15) {
+                    for(let i = whereToStart; i < 15; i++)
+                        this.analyzeNextRow(i)
+                    this.deleteHalfs(toDelete)
+                    this.keepProperPills(whereToStart)
+                    this.pillsToFall.forEach(pill => {
+                        pill.children.forEach(pillHalf => {
+                            this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = true
+                            this.bottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
+                        })
+                    })
+                    if(this.pillsToFall.length > 0) {
+                        let interval = setInterval(() => {
+                            if(this.pillsToFall.length > 0) {
+                                let pillsToDelete = []
+                                this.pillsToFall.forEach(pillToFall => {
+                                    pillToFall.children.forEach((pillHalf, index) => {
+                                        if(!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
+                                            let isToPush = true
+                                            pillsToDelete.forEach(pillToDelete => {
+                                                if(pillToDelete.uuid == pillToFall.uuid)
+                                                    isToPush = false
+                                            })
+                                            if(isToPush) {
+                                                pillsToDelete.push(pillToFall)
+                                                falling(pillToFall)
+                                                this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
+                                                this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
+                                                if(pillToFall.children.length == 2) {
+                                                    this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
+                                                    this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].color = pillToFall.children[(index + 1) % 2].color
+                                                }
+                                            }
+                                        }
+                                    })
+                                })
+                                pillsToDelete.forEach(pillToDelete => {
+                                    for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
+                                        if(pillToDelete.uuid == this.pillsToFall[i].uuid)
+                                            this.pillsToFall.splice(i, 1)
+                                    }
+                                })
+                                this.pillsToFall.forEach(pillToFall => {
+                                    pillToFall.children.forEach(pillHalf => {
+                                        pillHalf.posY--
+                                    })
+                                    pillToFall.position.y -= 20
+                                })
+                            }
+                            else {
+                                clearInterval(interval)
+                            }
+                        }, 500)
+                    }
+                }
+            }
+        }
+
     }
 
     checkPossibility = (sign) => {
-        const { fields } = this.bottle
         let agree = null
         let x = null
         let y = null
@@ -333,27 +237,22 @@ class Game {
             y = this.pill.children[0].posY
         else
             y = this.pill.children[1].posY
-
-        if (sign == '-') {
-            if (this.pill.positionSet % 2 == 0)
-                agree = fields[y][x - 1].allow
-            else {
-                if (fields[y][x - 1].allow && fields[y - 1][x - 1].allow)
-                    agree = true
-                else
-                    agree = false
-            }
+        if(sign == '-') {
+            this.bottle.children.forEach(field => {
+                if(field.posX == x - 1 && field.posY == y)
+                    agree = field.allow
+            })
         }
-        else if (sign == '+') {
-            if (this.pill.positionSet % 2 == 0)
-                agree = fields[y][x + 2].allow
-            else {
-                if (fields[y][x + 1].allow && fields[y - 1][x + 1].allow)
-                    agree = true
+        else if(sign == '+') {
+            this.bottle.children.forEach(field => {
+                if(this.pill.positionSet % 2 == 0) {
+                    if(field.posX == x + 2 && field.posY == y)
+                        agree = field.allow
+                }
                 else
-                    agree = false
-            }
-
+                    if(field.posX == x + 1 && field.posY == y)
+                        agree = field.allow
+            })
         }
         return agree
     }
@@ -385,13 +284,56 @@ class Game {
         return remember
     }
 
-    maybePushed = (pushedPills, pill) => {
+    maybePushed = (array, elementToCheck) => {
         let agree = false
-        pushedPills.forEach(element => {
-            if(element.uuid == pill.uuid)
+        array.forEach(element => {
+            if(element.uuid == elementToCheck.uuid)
                 agree = true
         })
         return agree
+    }
+
+    analyzeNextRow = (posY) => {
+        this.pillsToFall.forEach(pill => {
+            pill.children.forEach(pillHalf => {
+                if(pillHalf.posY == posY) {
+                    let obj = {
+                        posY: posY,
+                        posX: pillHalf.posX
+                    }
+                    this.checkUp(obj)
+                }
+            })
+        })
+    }
+
+    checkUp = (position) => {
+        this.scene.children[2].children.forEach(pill => {
+            if(!this.maybePushed(this.pillsToFall, pill)) {
+                pill.children.forEach((pillHalf, index) => {
+                    if(position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
+                        if(pill.children.length == 2) {
+                            if(pill.children[(index + 1) % 2].posX == pillHalf.posX)
+                                this.pillsToFall.push(pill)
+                            else {
+                                let obj = {
+                                    posY: pill.children[(index + 1) % 2].posY,
+                                    posX: pill.children[(index + 1) % 2].posX
+                                }
+                                if(!this.checkUnderEmpty(obj))
+                                    this.pillsToFall.push(pill)
+                                else {
+                                    if(this.checkUnderParent(obj))
+                                        this.pillsToFall.push(pill)
+                                }
+                            }
+                        }
+                        else
+                            this.pillsToFall.push(pill)
+                    }
+                })
+            }
+        })
     }
 
     checkUnderEmpty = (position) => {
@@ -405,9 +347,9 @@ class Game {
         return agree
     }
 
-    checkUnderParent = (position, pushedPills) => {
+    checkUnderParent = (position) => {
         let agree = false
-        pushedPills.forEach(pill => {
+        this.pillsToFall.forEach(pill => {
             pill.children.forEach(pillHalf => {
                 if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                     agree = true
@@ -416,59 +358,35 @@ class Game {
         return agree
     }
 
-    checkUp = (position, pillsToFall) => {
-        this.scene.children[2].children.forEach(pill => {
-            if(!this.maybePushed(pillsToFall, pill)) {
+    deleteHalfs = (toDelete) => {
+        toDelete.forEach(field => {
+            this.scene.children[2].children.forEach(pill => {
                 pill.children.forEach((pillHalf, index) => {
-                    if(position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
-                        if(pill.children.length == 2) {
-                            if(pill.children[(index + 1) % 2].posX == pillHalf.posX)
-                                pillsToFall.push(pill)
-                            else {
-                                let obj = {
-                                    posY: pill.children[(index + 1) % 2].posY,
-                                    posX: pill.children[(index + 1) % 2].posX
-                                }
-                                if(!this.checkUnderEmpty(obj))
-                                    pillsToFall.push(pill)
-                                else {
-                                    if(this.checkUnderParent(obj, pillsToFall))
-                                        pillsToFall.push(pill)
-                                }
-                            }
-                        }
+                    if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                        if(index == 0)
+                            pill.children.shift()
                         else
-                            pillsToFall.push(pill)
+                            pill.children.pop()
                     }
                 })
-            }
-        })
-    }
-
-    analyzeNextRow = (posY, pillsToFall) => {
-        pillsToFall.forEach(pill => {
-            pill.children.forEach(pillHalf => {
-                if(pillHalf.posY == posY) {
-                    let obj = {
-                        posY: posY,
-                        posX: pillHalf.posX
-                    }
-                    this.checkUp(obj, pillsToFall)
-                }
             })
         })
     }
 
-    // checkRest() {
-    //     let remember = []
-    //     this.scene.children[2].children.forEach((pill, index) => {
-    //         if (index < this.scene.children[2].children.length - 3)
-    //             pill.children.forEach(pillHalf => {
-    //                 if (this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow)
-    //                     remember.push(pillHalf)
-    //             })
-    //     })
-    //     console.log(remember)
-    // }
+    keepProperPills = (whereToStart) => {
+        for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
+            if(this.pillsToFall[i].children.length != 0) {
+                let agree = false
+                this.pillsToFall[i].children.forEach(pillHalf => {
+                    if(pillHalf.posY >= whereToStart)
+                        agree = true
+                })
+                if(!agree)
+                    this.pillsToFall.splice(i, 1)
+            }
+            else
+                this.pillsToFall.splice(i, 1)
+        }
+    }
 
 }
