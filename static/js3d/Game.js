@@ -34,6 +34,7 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
+
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
             new Pill(this.randomColor(), this.randomColor()),
