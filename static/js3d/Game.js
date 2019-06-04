@@ -105,7 +105,7 @@ class Game {
                         end = true
                 })
                 if(end) {
-                    // checkEndGame(this.pill)
+                    // checkEndGame(this.pill)sfsvvdds
                     falling(this.pill)
                     nextPill()
                     this.speed = settings.defaultSpeed
