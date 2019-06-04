@@ -34,7 +34,10 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
+<<<<<<< HEAD
         this.score = 0
+=======
+>>>>>>> fb25b55e705ba3b4e8efdc0a2c12c9740fe69a8a
 
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
