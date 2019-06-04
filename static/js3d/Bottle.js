@@ -7,9 +7,10 @@ class Bottle extends THREE.Object3D {
         super()
 
         this.fields = []
+        let row
 
         for(let i = 0; i < height; i++) {
-            let row = []
+            row = []
             for(let j = 0; j < width; j++) {
                 if(i == height - 1 && j == width / 2 + 2) {
                     for(let l = i + 1; l < i + 4; l++)
@@ -28,6 +29,12 @@ class Bottle extends THREE.Object3D {
             }
             this.fields.push(row)
         }
+        row = []
+        for(let j = width / 2 - 2; j < width / 2 + 2; j++) {
+            row.push(new Field(height, j))
+        }
+        this.fields.push(row)
+        console.log(this.fields)
         this.fields.forEach(row => {
             row.forEach(element => {
                 this.add(element)

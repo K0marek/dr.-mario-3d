@@ -6,4 +6,9 @@ body {
 
 #controls {
     position: absolute;
+    width: 100%;
+}
+
+#score {
+    color: white;
 }

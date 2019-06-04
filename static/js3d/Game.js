@@ -34,6 +34,10 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
+<<<<<<< HEAD
+        this.score = 0
+=======
+>>>>>>> fb25b55e705ba3b4e8efdc0a2c12c9740fe69a8a
 
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
@@ -190,7 +194,7 @@ class Game {
                                             })
                                             if(isToPush) {
                                                 pillsToDelete.push(pillToFall)
-                                                falling(pillToFall)
+                                                // falling(pillToFall)
                                                 this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
                                                 this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
                                                 if(pillToFall.children.length == 2) {
@@ -213,6 +217,9 @@ class Game {
                                     })
                                     pillToFall.position.y -= 20
                                 })
+                                if(this.pillsToFall.length == 0) {
+                                    clearInterval(interval)
+                                }
                             }
                             else {
                                 clearInterval(interval)
@@ -359,6 +366,8 @@ class Game {
     }
 
     deleteHalfs = (toDelete) => {
+        this.score += 200 * toDelete.length
+        $("#score").text("Twój wynik: " + this.score)
         toDelete.forEach(field => {
             this.scene.children[2].children.forEach(pill => {
                 pill.children.forEach((pillHalf, index) => {
@@ -375,18 +384,31 @@ class Game {
 
     keepProperPills = (whereToStart) => {
         for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
-            if(this.pillsToFall[i].children.length != 0) {
-                let agree = false
-                this.pillsToFall[i].children.forEach(pillHalf => {
-                    if(pillHalf.posY >= whereToStart)
-                        agree = true
-                })
-                if(!agree)
-                    this.pillsToFall.splice(i, 1)
-            }
-            else
+            if(this.pillsToFall[i].children.length == 0)
                 this.pillsToFall.splice(i, 1)
+            // else {
+            //     let agree = false
+            //     this.pillsToFall[i].children.forEach(pillHalf => {
+            //         if(pillHalf.posY >= whereToStart)
+            //             agree = true
+            //     })
+            //     if(!agree)
+            //         this.pillsToFall.splice(i, 1)
+            // }
         }
+        // for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
+        //     if(this.pillsToFall[i].children.length != 0) {
+        //         let agree = false
+        //         this.pillsToFall[i].children.forEach(pillHalf => {
+        //             if(pillHalf.posY >= whereToStart)
+        //                 agree = true
+        //         })
+        //         if(!agree)
+        //             this.pillsToFall.splice(i, 1)
+        //     }
+        //     else
+        //         this.pillsToFall.splice(i, 1)
+        // }
     }
 
 }
