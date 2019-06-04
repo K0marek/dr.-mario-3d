@@ -168,7 +168,7 @@ class Game {
             toDelete.forEach(field => {
                 field.allow = true
                 field.color = "nothing"
-                this.scene.children[2].children.forEach(pill => {
+                this.pillsContainer.children.forEach(pill => {
                     pill.children.forEach(pillHalf => {
                         if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
                             if(!this.maybePushed(this.pillsToFall, pill)) {
@@ -327,7 +327,7 @@ class Game {
     }
 
     checkUp = (position) => {
-        this.scene.children[2].children.forEach(pill => {
+        this.pillsContainer.children.forEach(pill => {
             if(!this.maybePushed(this.pillsToFall, pill)) {
                 pill.children.forEach((pillHalf, index) => {
                     if(position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
@@ -357,7 +357,7 @@ class Game {
 
     checkUnderEmpty = (position) => {
         let agree = false
-        this.scene.children[2].children.forEach(pill => {
+        this.pillsContainer.children.forEach(pill => {
             pill.children.forEach(pillHalf => {
                 if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                     agree = true
@@ -381,7 +381,7 @@ class Game {
         this.score += 200 * toDelete.length
         $("#score").text("Twój wynik: " + this.score)
         toDelete.forEach(field => {
-            this.scene.children[2].children.forEach(pill => {
+            this.pillsContainer.children.forEach(pill => {
                 pill.children.forEach((pillHalf, index) => {
                     if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
                         if(index == 0)
