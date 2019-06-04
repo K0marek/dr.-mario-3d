@@ -34,7 +34,7 @@ class Bottle extends THREE.Object3D {
             if(j > width / 2 - 3 && j < width / 2 + 2)
                 row.push(new Field(height, j))
             else
-                row.push(new Frame(height, j))//sdfsdf
+                row.push(new Frame(height, j))//sdsdfsdfsdfsdf
         }
         this.fields.push(row)
         this.fields.forEach(row => {
