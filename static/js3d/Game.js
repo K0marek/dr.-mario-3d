@@ -34,9 +34,6 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
-        this.score = 0
-        this.continueGame = true
-
         this.nextPills = [
             new Pill(this.randomColor(), this.randomColor()),
             new Pill(this.randomColor(), this.randomColor()),
@@ -74,10 +71,19 @@ class Game {
     play = (speed) => {
         this.speed = speed
         this.pillsToFall = []
+        this.score = 0
+        this.continueGame = true
 
         const nextPill = () => {
+            for(let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
+                if(this.pillsContainer.children[i].children.length == 0)
+                    this.pillsContainer.children.splice(i, 1)
+            }
 
             this.pill = this.nextPills[0]
+            this.pill.children.forEach(pillHalf => {
+                pillHalf.posY = 15
+            })
 
             this.nextPills.push(new Pill(this.randomColor(), this.randomColor()))
 
@@ -105,10 +111,15 @@ class Game {
                         end = true
                 })
                 if(end) {
-                    // checkEndGame(this.pill)sfsvvdds
                     falling(this.pill)
-                    nextPill()
-                    this.speed = settings.defaultSpeed
+                    if(!this.checkEndGame(this.pill)) {
+                        alert($("#score").text())
+                        this.continueGame = false
+                    }
+                    else {
+                        nextPill()
+                        this.speed = settings.defaultSpeed
+                    }
                 }
                 else {
                     this.pill.children.forEach(half => {
@@ -116,15 +127,17 @@ class Game {
                     })
                     this.pill.position.y -= 20
                 }
-                if(this.pillsToFall.length == 0)
-                    fall()
-                else {
-                    let interval = setInterval(() => {
-                        if(this.pillsToFall.length == 0) {
-                            clearInterval(interval)
-                            fall()
-                        }
-                    }, settings.defaultSpeed)
+                if(this.continueGame) {
+                    if(this.pillsToFall.length == 0)
+                        fall()
+                    else {
+                        let interval = setInterval(() => {
+                            if(this.pillsToFall.length == 0) {
+                                clearInterval(interval)
+                                fall()
+                            }
+                        }, settings.defaultSpeed)
+                    }
                 }
             }, this.speed)
         }
@@ -410,8 +423,13 @@ class Game {
         // }
     }
 
-    checkEndGame() {
-
+    checkEndGame = (pill) => {
+        let agree = true
+        pill.children.forEach(pillHalf => {
+            if(pillHalf.posY >= 15)
+                agree = false
+        })
+        return agree
     }
 
 }
