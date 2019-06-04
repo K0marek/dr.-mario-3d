@@ -111,12 +111,12 @@ class Game {
                         end = true
                 })
                 if(end) {
-                    falling(this.pill)
                     if(!this.checkEndGame(this.pill)) {
                         alert($("#score").text())
                         this.continueGame = false
                     }
                     else {
+                        falling(this.pill)
                         nextPill()
                         this.speed = settings.defaultSpeed
                     }
@@ -238,6 +238,12 @@ class Game {
                             }
                         }, 500)
                     }
+                }
+            }
+            else {
+                if(!this.checkEndGame(this.pill)) {
+                    alert($("#score").text())
+                    this.continueGame = false
                 }
             }
         }
