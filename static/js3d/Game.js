@@ -73,7 +73,6 @@ class Game {
         this.pillsToFall = []
         this.score = 0
         this.continueGame = true
-        this.checkingPills = false
 
         const nextPill = () => {
             for(let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
