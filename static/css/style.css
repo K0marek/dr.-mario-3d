@@ -12,3 +12,33 @@ body {
 #score {
     color: white;
 }
+
+#menu {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 50px;
+    height: 600px;
+    width: 600px;
+    margin: 0 auto;
+    color: #00806a;
+    border: 5px solid #00806a;
+    background-color: black;
+    text-align: center;
+    font-size: 36px;
+}
+
+#onePlayerSettings, #twoPlayersSettings, #login {
+    display: none;
+}
+
+#nicks {
+    position: absolute;
+    color: white;
+}
+
+.selecte {
+    background-color: red;
+}

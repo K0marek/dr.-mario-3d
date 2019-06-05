@@ -68,7 +68,7 @@ class Game {
         return colors[random]
     }
 
-    play = (speed) => {
+    play = (speed, pillStartX = 0) => {
         this.speed = speed
         this.pillsToFall = []
         this.score = 0
@@ -96,7 +96,7 @@ class Game {
             this.nextPills.shift()
 
             this.pill.position.y = settings.cellSize * 15
-            this.pill.position.x = 0
+            this.pill.position.x = pillStartX
         }
 
         nextPill()
@@ -111,6 +111,7 @@ class Game {
                     if(!fields[half.posY - 1][half.posX].allow)
                         end = true
                 })
+
                 if(end) {
                     if(!this.checkEndGame(this.pill)) {
                         alert($("#score").text())
@@ -128,12 +129,13 @@ class Game {
                     })
                     this.pill.position.y -= 20
                 }
+
                 if(this.continueGame) {
                     if(this.pillsToFall.length == 0)
                         fall()
                     else {
                         let interval = setInterval(() => {
-                            if(this.pillsToFall.length == 0 && !this.checkingPills) {
+                            if(this.pillsToFall.length == 0) {
                                 clearInterval(interval)
                                 fall()
                             }
@@ -334,6 +336,7 @@ class Game {
     }
 
     checkUp = (position) => {
+
         this.pillsContainer.children.forEach(pill => {
             if(!this.maybePushed(this.pillsToFall, pill)) {
                 pill.children.forEach((pillHalf, index) => {

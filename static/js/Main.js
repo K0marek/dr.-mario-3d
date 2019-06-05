@@ -1,9 +1,11 @@
 console.log("wczytano plik Main.js")
 
-var ui
-var game
+let ui
+let game
+let net
 
-$(document).ready(function() {
+$(document).ready(function () {
     ui = new Ui()
     game = new Game()
+    net = new Net()
 })
