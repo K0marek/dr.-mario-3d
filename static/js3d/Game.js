@@ -168,7 +168,7 @@ class Game {
             let whereToStart = 15
             toDelete.forEach(field => {
                 field.allow = true
-                field.color = "nothing"
+                field.color = "nothing" //sdfsdf
                 this.pillsContainer.children.forEach(pill => {
                     pill.children.forEach(pillHalf => {
                         if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
