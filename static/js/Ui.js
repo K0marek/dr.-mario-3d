@@ -103,7 +103,6 @@ class Ui {
         $('#playButton').on('click', e => {
             game.play(settings.defaultSpeed)
             $('#menu').remove()
-            $("#controls").empty()
             let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
             $("#controls").append(dv)
         })
