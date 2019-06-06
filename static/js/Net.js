@@ -6,7 +6,7 @@ class Net {
         this.which = null // który z kolei user
 
         this.client.on('both', data => {
-            const { which, nick, id, enemy } = data
+            const {which, nick, id, enemy} = data
             this.id = id
             this.enemy = enemy
             this.which = which
@@ -47,12 +47,12 @@ class Net {
             $('#menu').remove()
             game.enemyBottle = new Bottle(16, 10)
             game.scene.add(game.enemyBottle)
-            if (this.which % 2 == 0) { // pierwszy user
+            if(this.which % 2 == 0) { // pierwszy user
                 game.bottle.position.x = -240
                 game.enemyBottle.position.x = 60
                 game.play(settings.defaultSpeed, -160)
             }
-            if (this.which % 2 == 1) { // drugi user
+            if(this.which % 2 == 1) { // drugi user
                 game.bottle.position.x = 60
                 game.enemyBottle.position.x = -240
                 game.play(settings.defaultSpeed, 140)
@@ -93,6 +93,22 @@ class Net {
         //emitiowanie połączenia
         this.client.emit('login', {
             nick
+        })
+    }
+
+    getViruses = level => {
+        $.ajax({
+            url: "http://localhost:3000/LOAD_LEVEL",
+            data: {},
+            method: "POST",
+            success: function(data) {
+                let obj = JSON.parse(data)
+                console.log(obj)
+                game.createViruses(obj.documents[0].board[level].viruses)
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr)
+            }
         })
     }
 }

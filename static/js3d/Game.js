@@ -38,6 +38,9 @@ class Game {
         for (let i = 0; i < 6; i++) {
             this.nextPillColors.push(this.randomColor())
         }
+
+        this.allViruses = new THREE.Object3D
+
         this.nextPills = [
             new Pill(this.nextPillColors[0], this.nextPillColors[1]),
             new Pill(this.nextPillColors[2], this.nextPillColors[3]),
@@ -65,10 +68,10 @@ class Game {
     randomColor = () => {
         // let colors = [0xff0000]
         // let random = Math.floor(Math.random() * 1)
-        let colors = [0xff0000, 0x0000ff]
-        let random = Math.floor(Math.random() * 2)
-        // let colors = [0xff0000, 0x0000ff, 0xffff00]
-        // let random = Math.floor(Math.random() * 3)
+        // let colors = [0xff0000, 0x0000ff]
+        // let random = Math.floor(Math.random() * 2)
+        let colors = [0xff0000, 0x0000ff, 0xffff00]
+        let random = Math.floor(Math.random() * 3)
         return colors[random]
     }
 
@@ -428,7 +431,24 @@ class Game {
                     }
                 })
             })
+            this.allViruses.children.forEach((virus, index) => {
+                if (virus.posY == field.posY && virus.posX == field.posX) {
+                    if (virus.posY < 14) {
+                        let obj = {
+                            posY: virus.posY,
+                            posX: virus.posX
+                        }
+                        this.checkUp(obj)
+                    }
+                    this.allViruses.children.splice(index, 1)
+                    this.numberOfViruses--
+                }
+            })
         })
+        if (this.numberOfViruses == 0) {
+            this.continueGame = false
+            alert("WYGRAŁEŚ")
+        }
     }
 
     keepProperPills = (whereToStart) => {
@@ -467,6 +487,16 @@ class Game {
                 agree = false
         })
         return agree
+    }
+
+    createViruses = (viruses) => {
+        this.numberOfViruses = viruses.length
+        viruses.forEach(virus => {
+            this.allViruses.add(new Virus(virus.posX, virus.posY, virus.color))
+        })
+        console.log(this.allViruses)
+        this.allViruses.position.x -= 80
+        this.scene.add(this.allViruses)
     }
 
 }
