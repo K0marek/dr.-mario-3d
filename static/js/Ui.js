@@ -62,6 +62,14 @@ class Ui {
                             pill.positionSet = 2
                         }
                     }
+                    net.client.emit('change', {
+                        enemy: net.enemy,
+                        posX: game.pill.half1.posX,
+                        posY: game.pill.half1.posY,
+                        half1color: game.pill.color1,
+                        half2color: game.pill.color2,
+                        pillRotation: game.pill.rotation.z
+                    })
                     break
                 //LEFT
                 case 37:
@@ -69,6 +77,14 @@ class Ui {
                         pill.position.x -= 20
                         pill.children.forEach(half => {
                             half.posX--
+                        })
+                        net.client.emit('change', {
+                            enemy: net.enemy,
+                            posX: game.pill.half1.posX,
+                            posY: game.pill.half1.posY,
+                            half1color: game.pill.color1,
+                            half2color: game.pill.color2,
+                            pillRotation: game.pill.rotation.z
                         })
                     }
                     break
@@ -78,6 +94,14 @@ class Ui {
                         pill.position.x += 20
                         pill.children.forEach(half => {
                             half.posX++
+                        })
+                        net.client.emit('change', {
+                            enemy: net.enemy,
+                            posX: game.pill.half1.posX,
+                            posY: game.pill.half1.posY,
+                            half1color: game.pill.color1,
+                            half2color: game.pill.color2,
+                            pillRotation: game.pill.rotation.z
                         })
                     }
                     break

@@ -34,10 +34,14 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
+        this.nextPillColors = []
+        for (let i = 0; i < 6; i++) {
+            this.nextPillColors.push(this.randomColor())
+        }
         this.nextPills = [
-            new Pill(this.randomColor(), this.randomColor()),
-            new Pill(this.randomColor(), this.randomColor()),
-            new Pill(this.randomColor(), this.randomColor())
+            new Pill(this.nextPillColors[0], this.nextPillColors[1]),
+            new Pill(this.nextPillColors[2], this.nextPillColors[3]),
+            new Pill(this.nextPillColors[4], this.nextPillColors[5])
         ]
 
         this.pillsContainer = new PillsContainer()
@@ -85,17 +89,31 @@ class Game {
                 pillHalf.posY = 15
             })
 
-            this.nextPills.push(new Pill(this.randomColor(), this.randomColor()))
+            this.nextPillColors.shift()
+            this.nextPillColors.shift()
+            this.nextPillColors.push(this.randomColor(), this.randomColor())
+            this.nextPills.push(new Pill(this.nextPillColors[4], this.nextPillColors[5]))
 
+            this.nextPillsContainer = new PillsContainer()
             this.nextPills.forEach((item, index) => {
-                this.pillsContainer.add(item)
-                item.position.set(150, 200 - index * settings.cellSize, 0)
+                this.nextPillsContainer.add(item)
+                item.position.set(0, 60 - index * settings.cellSize, 0)
             })
+            this.scene.add(this.nextPillsContainer)
+            if (net.enemy == null) // pozycja dla jednego gracza
+                this.nextPillsContainer.position.set(160, 120, 0)
+            else // pozycja dla 2 graczy zależy od tego który z kolei jest to podłączony gracz
+                this.nextPillsContainer.position.set(net.which % 2 == 0 ? -320 : 280, 120, 0)
 
             this.nextPills.shift()
 
             this.pill.position.y = settings.cellSize * 15
             this.pill.position.x = pillStartX
+
+            net.client.emit('nextPills', {
+                enemy: net.enemy,
+                nextPillColors: this.nextPillColors
+            })
         }
 
         nextPill()
@@ -103,6 +121,15 @@ class Game {
         ui.controls()
 
         const fall = () => {
+            this.pillsContainer.add(this.pill)
+            net.client.emit('change', {
+                enemy: net.enemy,
+                posX: this.pill.half1.posX,
+                posY: this.pill.half1.posY,
+                half1color: this.pill.color1,
+                half2color: this.pill.color2,
+                pillRotation: this.pill.rotation.z
+            })
             setTimeout(() => {
                 const { fields } = this.bottle
                 let end = false
@@ -130,8 +157,9 @@ class Game {
                 }
 
                 if (this.continueGame) {
-                    if (this.pillsToFall.length == 0)
+                    if (this.pillsToFall.length == 0) {
                         fall()
+                    }
                     else {
                         let interval = setInterval(() => {
                             if (this.pillsToFall.length == 0) {
@@ -169,7 +197,7 @@ class Game {
             let whereToStart = 15
             toDelete.forEach(field => {
                 field.allow = true
-                field.color = "nothing"
+                field.color = "nothing" //sdfsdf
                 this.pillsContainer.children.forEach(pill => {
                     pill.children.forEach(pillHalf => {
                         if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
