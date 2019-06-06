@@ -58,6 +58,34 @@ class Net {
                 game.play(settings.defaultSpeed, 140)
             }
         })
+
+        this.client.on('change', data => {
+            const { cellSize } = settings
+            const translation = this.which % 2 == 0 ? 60 : -240
+            game.scene.remove(game.enemyPill)
+            game.enemyPill = new Pill(data.half1color, data.half2color)
+            game.enemyPill.position.x = data.posX * cellSize + translation
+            game.enemyPill.position.y = data.posY * cellSize
+            game.enemyPill.rotation.z = data.pillRotation
+            game.scene.add(game.enemyPill)
+        })
+
+        this.client.on('nextPills', data => {
+            const { nextPillColors } = data
+            const nextPills = [
+                new Pill(nextPillColors[0], nextPillColors[1]),
+                new Pill(nextPillColors[2], nextPillColors[3]),
+                new Pill(nextPillColors[4], nextPillColors[5])
+            ]
+            game.enemyNextPillsContainer = new PillsContainer()
+            nextPills.forEach((item, index) => {
+                game.enemyNextPillsContainer.add(item)
+                item.position.set(0, 60 - index * settings.cellSize, 0)
+            })
+            game.enemyNextPillsContainer.position.set(this.which % 2 == 0 ? 280 : -320, 120, 0)
+            game.scene.add(game.enemyNextPillsContainer)
+        })
+
     }
 
     addUser = nick => {

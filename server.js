@@ -104,5 +104,13 @@ socketio.on("connection", function(client) {
       socketio.sockets.to(data.enemy).emit('startGame')
     })
 
+    client.on('change', data => {
+      socketio.sockets.to(data.enemy).emit('change', data)
+    })
+
+    client.on('nextPills', data => {
+      socketio.sockets.to(data.enemy).emit('nextPills', data)
+    })
+
   })
 })
