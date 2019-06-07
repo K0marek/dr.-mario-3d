@@ -1,4 +1,4 @@
-console.log("wczytano plik Settings.js")
+console.log("wczytano plik settings.js")
 
 settings = {
     cellSize: 20,
