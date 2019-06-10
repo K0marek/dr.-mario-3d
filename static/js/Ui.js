@@ -2,23 +2,23 @@ console.log("wczytano plik Ui.js")
 
 class Ui {
 
-    constructor() { }
+    constructor() {}
 
     //UTWORZENIE STEROWANIA W GRZE
     controls = () => {
         $(document).on('keydown', e => {
-            if (game.pillsToFall.length == 0) {
-                const { pill } = game
-                const { cellSize } = settings
-                const { fields } = game.bottle
-                switch (e.keyCode) {
+            if(game.pillsToFall.length == 0) {
+                const {pill} = game
+                const {cellSize} = settings
+                const {fields} = game.bottle
+                switch(e.keyCode) {
                     //Z
                     case 90:
                         pill.positionSet++
-                        if (pill.positionSet == 0) {
+                        if(pill.positionSet == 0) {
                             pill.rotation.z = Math.PI / 2
                             pill.position.y -= cellSize
-                            if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
+                            if(!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
                                 pill.position.x -= cellSize
                                 pill.children[0].posX--
                                 pill.children[0].posY--
@@ -27,8 +27,8 @@ class Ui {
                                 pill.children[0].posY--
                             }
                         }
-                        else if (pill.positionSet == 1) {
-                            if (fields[pill.children[0].posY + 1][pill.children[0].posX].allow) {
+                        else if(pill.positionSet == 1) {
+                            if(fields[pill.children[0].posY + 1][pill.children[0].posX].allow) {
                                 pill.rotation.z = Math.PI
                                 pill.children[1].posX--
                                 pill.children[1].posY++
@@ -36,9 +36,9 @@ class Ui {
                                 pill.positionSet = 0
                             }
                         }
-                        else if (pill.positionSet == 2) {
-                            if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
-                                if (fields[pill.children[1].posY - 1][pill.children[1].posX - 1].allow) {
+                        else if(pill.positionSet == 2) {
+                            if(!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
+                                if(fields[pill.children[1].posY - 1][pill.children[1].posX - 1].allow) {
                                     pill.rotation.z = Math.PI * 1.5
                                     pill.children[1].posX--
                                     pill.children[1].posY--
@@ -51,8 +51,8 @@ class Ui {
                                 pill.children[1].posY--
                             }
                         }
-                        else if (pill.positionSet == 3) {
-                            if (fields[pill.children[1].posY + 1][pill.children[1].posX].allow) {
+                        else if(pill.positionSet == 3) {
+                            if(fields[pill.children[1].posY + 1][pill.children[1].posX].allow) {
                                 pill.positionSet = -1
                                 pill.position.x -= cellSize
                                 pill.position.y += cellSize
@@ -74,7 +74,7 @@ class Ui {
                         break
                     //LEFT
                     case 37:
-                        if (game.checkPossibility('-')) {
+                        if(game.checkPossibility('-')) {
                             pill.position.x -= 20
                             pill.children.forEach(half => {
                                 half.posX--
@@ -91,7 +91,7 @@ class Ui {
                         break
                     //RIGHT
                     case 39:
-                        if (game.checkPossibility('+')) {
+                        if(game.checkPossibility('+')) {
                             pill.position.x += 20
                             pill.children.forEach(half => {
                                 half.posX++
@@ -115,7 +115,7 @@ class Ui {
         })
 
         $(document).on('keyup', e => {
-            switch (e.keyCode) {
+            switch(e.keyCode) {
                 case 40:
                     game.speed = settings.defaultSpeed
                     break
@@ -126,7 +126,11 @@ class Ui {
     //OBSŁUGA KLIKNIĘĆ
     interface = () => {
         $('#playButton').on('click', e => {
-            net.getViruses($("#level").val())
+            for(let i = 0; i < $("#speedButtons>button").length; i++) {
+                let bt = $("#speedButtons>button")[i]
+                if($(bt).hasClass("btn-danger"))
+                    net.getViruses($("#level").val(), i + 1, -80)
+            }
         })
 
         $('#onePlayer').on('click', e => {
@@ -169,6 +173,21 @@ class Ui {
             })
         })
 
+        $('.speedButtons').on('click', e => {
+            $('.speedButtons')
+                .removeClass('btn-danger')
+                .addClass('btn-primary')
+            $(e.target)
+                .removeClass('btn-primary')
+                .addClass('btn-danger')
+
+            const value = e.target.value
+            net.client.emit('changeSpeedButtons', {
+                value,
+                enemy: net.enemy
+            })
+        })
+
         $('.speedButtons1p').on('click', e => {
             $('.speedButtons1p')
                 .removeClass('btn-danger')
@@ -200,10 +219,27 @@ class Ui {
         })
 
         $('#playButton2p').on('click', e => {
-            net.client.emit('startGame', {
-                id: net.id,
-                enemy: net.enemy
-            })
+            let divisor1
+            for(let i = 0; i < $("#speedButtons1p>button").length; i++) {
+                let bt = $("#speedButtons1p>button")[i]
+                if($(bt).hasClass("btn-danger")) {
+                    divisor1 = i + 1
+                }
+            }
+            for(let i = 0; i < $("#speedButtons2p>button").length; i++) {
+                let bt = $("#speedButtons2p>button")[i]
+                if($(bt).hasClass("btn-danger")) {
+                    net.client.emit('startGame', {
+                        id: net.id,
+                        enemy: net.enemy,
+                        level1: $("#level1p").val(),
+                        level2: $("#level2p").val(),
+                        divisor1: divisor1,
+                        divisor2: i + 1
+                    })
+                }
+                // net.getViruses($("#level1p").val(), i + 1)
+            }
         })
 
     }
