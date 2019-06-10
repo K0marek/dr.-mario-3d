@@ -155,7 +155,16 @@ class Net {
             method: "POST",
             success: function (data) {
                 let obj = JSON.parse(data)
-                // game.createViruses(obj.documents[0].board[level].viruses)
+                console.log(obj)
+                if (obj.actionBack == "CREATED") {
+                    game.createViruses(obj.documents[0].board[level].viruses)
+                    game.play(settings.defaultSpeed)
+                    $('#menu').remove()
+                    let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
+                    $("#controls").append(dv)
+                }
+                else
+                    console.log("Nie udało sie pobrać dokumentów z bazy danych")
             },
             error: function (xhr, status, error) {
                 console.log(xhr)

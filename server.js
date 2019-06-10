@@ -24,9 +24,7 @@ app.post("/LOAD_LEVEL", function (req, res) {
   mongoClient.connect("mongodb://" + "localhost" + "/" + "DrMario", function (err, db) {
     if (err) {
       console.log(err)
-      obj = {
-        actionBack: "NOT_CREATED",
-      }
+      obj = { actionBack: "NOT_CREATED" }
       res.send(JSON.stringify(obj, null, 5))
     }
     else {
@@ -38,14 +36,10 @@ app.post("/LOAD_LEVEL", function (req, res) {
             actionBack: "CREATED",
             documents: _docs
           }
-          res.send(JSON.stringify(obj, null, 5))
         }
-        else {
-          obj = {
-            actionBack: "NOT_CREATED",
-          }
-          res.send(JSON.stringify(obj, null, 5))
-        }
+        else
+          obj = { actionBack: "NOT_CREATED" }
+        res.send(JSON.stringify(obj, null, 5))
       })
     }
   })
