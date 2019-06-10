@@ -12,17 +12,17 @@ let _db, _coll = "Data", _docs
 // tablica z graczami
 const users = []
 
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static("static"))
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.sendFile(__dirname + "/static/html/index.html")
 })
 
-app.post("/LOAD_LEVEL", function(req, res) {
+app.post("/LOAD_LEVEL", function (req, res) {
   let obj
-  mongoClient.connect("mongodb://" + "localhost" + "/" + "DrMario", function(err, db) {
-    if(err) {
+  mongoClient.connect("mongodb://" + "localhost" + "/" + "DrMario", function (err, db) {
+    if (err) {
       console.log(err)
       obj = {
         actionBack: "NOT_CREATED",
@@ -31,8 +31,8 @@ app.post("/LOAD_LEVEL", function(req, res) {
     }
     else {
       _db = db
-      opers.SelectAll(_db.collection(_coll), function(data) {
-        if(data.action == "SELECTED") {
+      opers.SelectAll(_db.collection(_coll), function (data) {
+        if (data.action == "SELECTED") {
           _docs = data.items
           obj = {
             actionBack: "CREATED",
@@ -51,11 +51,11 @@ app.post("/LOAD_LEVEL", function(req, res) {
   })
 })
 
-http.listen(PORT, function() {
+http.listen(PORT, function () {
   console.log("start serwera na porcie " + PORT)
 })
 
-socketio.on("connection", function(client) {
+socketio.on("connection", function (client) {
   client.on('login', data => {
     const object = {
       id: client.id, // unikatowe id klienta
@@ -64,7 +64,7 @@ socketio.on("connection", function(client) {
       enemy: null // id przeciwnika
     }
     users.push(object)
-    if(object.which % 2 == 1) {
+    if (object.which % 2 == 1) {
       const previousUser = users[users.length - 2] // poprzednio zalogowany user
 
       object.enemy = previousUser.id
@@ -110,6 +110,14 @@ socketio.on("connection", function(client) {
 
     client.on('nextPills', data => {
       socketio.sockets.to(data.enemy).emit('nextPills', data)
+    })
+
+    client.on('fly', data => {
+      socketio.sockets.to(data.enemy).emit('fly', data)
+    })
+
+    client.on('pillsBoard', data => {
+      socketio.sockets.to(data.enemy).emit('pillsBoard', data)
     })
 
   })

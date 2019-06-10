@@ -19,9 +19,6 @@ class Game {
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         $("#root").append(this.renderer.domElement)
 
-        this.axes = new THREE.AxesHelper(1000)
-        this.scene.add(this.axes)
-
         this.camera.position.set(0, 100, 600)
         this.camera.lookAt(this.scene.position.x, this.scene.position.x + 150, this.scene.position.z)
 
@@ -34,19 +31,47 @@ class Game {
         this.bottle = new Bottle(16, 10)
         this.scene.add(this.bottle)
 
+        // model
+        this.mario = new Mario()
+        this.mario.loadModel(modeldata => {
+            this.scene.add(modeldata)
+        })
+
+        this.clock = new THREE.Clock()
+
+        this.light = new Light()
+        this.scene.add(this.light.container)
+
+        //tablica z kolorami następnych pilli do generowania ich
         this.nextPillColors = []
         for (let i = 0; i < 6; i++) {
             this.nextPillColors.push(this.randomColor())
         }
 
+        //obiekt 3d na wszystkie wirusy
         this.allViruses = new THREE.Object3D
 
+        // tablica z pillami odpowiednich kolorów
         this.nextPills = [
             new Pill(this.nextPillColors[0], this.nextPillColors[1]),
             new Pill(this.nextPillColors[2], this.nextPillColors[3]),
             new Pill(this.nextPillColors[4], this.nextPillColors[5])
         ]
 
+        // tablica będąca odzwierciedleniem pilli na planszy
+        this.pillsBoard = this.bottle.fields.map(row => {
+            return row.map(item => {
+                if (item.allow)
+                    return 0
+                else
+                    return 1 // jeżeli pole to część ramki (zajęte) wstawiam tam 1
+            })
+        })
+
+        //tablica przeciwnika
+        this.enemyPillsBoard = []
+
+        // kontener na wszystkie pille
         this.pillsContainer = new PillsContainer()
         this.scene.add(this.pillsContainer)
 
@@ -59,6 +84,9 @@ class Game {
     }
 
     render() {
+
+        if (this.mario.loaded)
+            this.mario.updateModel()
 
         requestAnimationFrame(this.render.bind(this))
         this.renderer.render(this.scene, this.camera)
@@ -81,37 +109,83 @@ class Game {
         this.score = 0
         this.continueGame = true
 
+        const fly = startX => {
+            const parable = x => -0.03 * Math.pow(x - startX, 2) + 3.7 * (x - startX) + 300
+            const reverseParable = x => -0.03 * Math.pow(x - startX, 2) - 3.7 * (x - startX) + 300
+            let interval
+            if (net.which % 2 == 1 || net.which == null)
+                interval = setInterval(() => {
+                    this.pill.position.y = parable(this.pill.position.x)
+                    this.pill.rotation.z -= Math.PI / 75
+                    this.pill.position.x--
+                    if (this.pill.position.x == startX) {
+                        this.pill.position.y = 300
+                        clearInterval(interval)
+                        fall()
+                    }
+                }, 10)
+            else if (net.which % 2 == 0)
+                interval = setInterval(() => {
+                    this.pill.position.y = reverseParable(this.pill.position.x)
+                    this.pill.rotation.z += Math.PI / 75
+                    this.pill.position.x++
+                    if (this.pill.position.x == startX) {
+                        this.pill.position.y = 300
+                        clearInterval(interval)
+                        fall()
+                    }
+                }, 10)
+        }
+
         const nextPill = () => {
+
+            this.mario.throwPill()
+
             for (let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
                 if (this.pillsContainer.children[i].children.length == 0)
                     this.pillsContainer.children.splice(i, 1)
             }
 
-            this.pill = this.nextPills[0]
+            this.pill = new Pill(this.nextPillColors[0], this.nextPillColors[1])
             this.pill.children.forEach(pillHalf => {
                 pillHalf.posY = 15
             })
+            this.scene.add(this.pill)
 
             this.nextPillColors.shift()
             this.nextPillColors.shift()
+            this.nextPills.shift()
             this.nextPillColors.push(this.randomColor(), this.randomColor())
             this.nextPills.push(new Pill(this.nextPillColors[4], this.nextPillColors[5]))
 
             this.nextPillsContainer = new PillsContainer()
             this.nextPills.forEach((item, index) => {
                 this.nextPillsContainer.add(item)
-                item.position.set(0, 60 - index * settings.cellSize, 0)
+                item.position.set(0, 40 - index * settings.cellSize, 0)
             })
             this.scene.add(this.nextPillsContainer)
             if (net.enemy == null) // pozycja dla jednego gracza
-                this.nextPillsContainer.position.set(160, 120, 0)
+                this.nextPillsContainer.position.set(150, 120, 0)
             else // pozycja dla 2 graczy zależy od tego który z kolei jest to podłączony gracz
-                this.nextPillsContainer.position.set(net.which % 2 == 0 ? -320 : 280, 120, 0)
+                this.nextPillsContainer.position.set(net.which % 2 == 0 ? -310 : 290, 120, 0)
 
-            this.nextPills.shift()
+            if (net.enemy == null) {
+                this.pill.position.x = 150
+                this.pill.position.y = 165
+                fly(0)
+            } else {
+                this.pill.position.x = net.which % 2 == 0 ? -310 : 290
+                this.pill.position.y = 165
+                fly(net.which % 2 == 0 ? -160 : 140)
 
-            this.pill.position.y = settings.cellSize * 15
-            this.pill.position.x = pillStartX
+                net.client.emit('fly', {
+                    enemy: net.enemy,
+                    startX: net.which % 2 == 0 ? -310 : 290,
+                    endX: net.which % 2 == 0 ? -160 : 140,
+                    color1: this.pill.color1,
+                    color2: this.pill.color2,
+                })
+            }
 
             net.client.emit('nextPills', {
                 enemy: net.enemy,
@@ -140,8 +214,19 @@ class Game {
                     if (!fields[half.posY - 1][half.posX].allow)
                         end = true
                 })
-
                 if (end) {
+                    // informacje o każdej części pilla zapisuje w tablicy this.pillsBoard
+                    this.pillsBoard[this.pill.half1.posY][this.pill.half1.posX] = {
+                        posX: this.pill.position.x,
+                        posY: this.pill.position.y,
+                        color1: this.pill.color1,
+                        color2: this.pill.color2,
+                        pillRotation: this.pill.rotation.z
+                    }
+                    net.client.emit('pillsBoard', {
+                        enemy: net.enemy,
+                        pillsBoard: this.pillsBoard
+                    })
                     if (!this.checkEndGame(this.pill)) {
                         alert($("#score").text())
                         this.continueGame = false
@@ -150,6 +235,7 @@ class Game {
                         falling(this.pill)
                         nextPill()
                         this.speed = settings.defaultSpeed
+                        return
                     }
                 }
                 else {
@@ -174,8 +260,6 @@ class Game {
                 }
             }, this.speed)
         }
-
-        fall()
 
         const falling = (pill) => {
             pill.children.forEach(half => {
@@ -285,32 +369,20 @@ class Game {
 
     checkPossibility = (sign) => {
         let agree = null
-        let x = null
-        let y = null
-        if (this.pill.children[0].posX < this.pill.children[1].posX)
-            x = this.pill.children[0].posX
-        else
-            x = this.pill.children[1].posX
-        if (this.pill.children[0].posY > this.pill.children[1].posY)
-            y = this.pill.children[0].posY
-        else
-            y = this.pill.children[1].posY
+        const { fields } = this.bottle
+        const { half1, half2 } = this.pill
+
         if (sign == '-') {
-            this.bottle.children.forEach(field => {
-                if (field.posX == x - 1 && field.posY == y)
-                    agree = field.allow
-            })
+            if (fields[half1.posY][half1.posX - 1].allow && fields[half2.posY][half2.posX - 1].allow)
+                agree = true
+            else
+                agree = false
         }
         else if (sign == '+') {
-            this.bottle.children.forEach(field => {
-                if (this.pill.positionSet % 2 == 0) {
-                    if (field.posX == x + 2 && field.posY == y)
-                        agree = field.allow
-                }
-                else
-                    if (field.posX == x + 1 && field.posY == y)
-                        agree = field.allow
-            })
+            if (fields[half1.posY][half1.posX + 1].allow && fields[half2.posY][half2.posX + 1].allow)
+                agree = true
+            else
+                agree = false
         }
         return agree
     }

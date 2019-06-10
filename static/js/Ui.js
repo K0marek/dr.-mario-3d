@@ -125,17 +125,12 @@ class Ui {
 
     //OBSŁUGA KLIKNIĘĆ
     interface = () => {
-        console.log("INTERFACE")
         $('#playButton').on('click', e => {
             game.play(settings.defaultSpeed)
-            console.log($("#level").val())
             net.getViruses($("#level").val())
             $('#menu').remove()
             let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
             $("#controls").append(dv)
-        })
-        $("#level").on("input", () => {
-            console.log($("#level").val())
         })
 
         $('#onePlayer').on('click', e => {

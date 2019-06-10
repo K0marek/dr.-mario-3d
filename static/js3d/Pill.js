@@ -1,7 +1,7 @@
 console.log("wczytano plik Pill.js")
 
 class Pill extends THREE.Object3D {
-    constructor(color1 = 0xff0000, color2 = 0x0000ff) {
+    constructor(color1, color2) {
 
         super()
 
