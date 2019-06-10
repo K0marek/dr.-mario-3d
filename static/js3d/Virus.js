@@ -1,7 +1,7 @@
 console.log("wczytano plik Virus.js")
 
 class Virus extends THREE.Object3D {
-    constructor(posX, posY, color) {
+    constructor(posX, posY, color, whichBottle) {
         super()
         // let colors = [0xff0000, 0x0000ff]
         // let random = Math.floor(Math.random() * 2)
@@ -18,8 +18,8 @@ class Virus extends THREE.Object3D {
         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
         this.add(sphere)
         this.position.set(posX * cellSize, posY * cellSize, 0)
-        game.bottle.fields[posY][posX].allow = false
-        game.bottle.fields[posY][posX].color = this.color
+        whichBottle.fields[posY][posX].allow = false
+        whichBottle.fields[posY][posX].color = this.color
         return this
     }
 
