@@ -9,6 +9,240 @@ let ObjectID = require('mongodb').ObjectID
 let opers = require("./modules/Operations.js")
 let _db, _coll = "Data", _docs
 
+let viruses = {
+  "board": [
+    {
+      "viruses": [
+        {
+          "posY": 2,
+          "posX": 7,
+          "color": 255
+        },
+        {
+          "posY": 3,
+          "posX": 1,
+          "color": 16776960
+        },
+        {
+          "posY": 4,
+          "posX": 8,
+          "color": 16711680
+        },
+        {
+          "posY": 5,
+          "posX": 4,
+          "color": 16776960
+        },
+        {
+          "posY": 6,
+          "posX": 3,
+          "color": 16711680
+        },
+        {
+          "posY": 8,
+          "posX": 3,
+          "color": 255
+        }
+      ]
+    },
+    {
+      "viruses": [
+        {
+          "posY": 2,
+          "posX": 2,
+          "color": 16776960
+        },
+        {
+          "posY": 3,
+          "posX": 1,
+          "color": 255
+        },
+        {
+          "posY": 4,
+          "posX": 7,
+          "color": 16711680
+        },
+        {
+          "posY": 5,
+          "posX": 3,
+          "color": 16776960
+        },
+        {
+          "posY": 5,
+          "posX": 7,
+          "color": 16776960
+        },
+        {
+          "posY": 6,
+          "posX": 6,
+          "color": 16711680
+        },
+        {
+          "posY": 7,
+          "posX": 5,
+          "color": 255
+        }
+      ]
+    },
+    {
+      "viruses": [
+        {
+          "posY": 1,
+          "posX": 1,
+          "color": 16776960
+        },
+        {
+          "posY": 1,
+          "posX": 2,
+          "color": 255
+        },
+        {
+          "posY": 1,
+          "posX": 3,
+          "color": 16711680
+        },
+        {
+          "posY": 1,
+          "posX": 4,
+          "color": 16776960
+        },
+        {
+          "posY": 1,
+          "posX": 5,
+          "color": 16776960
+        },
+        {
+          "posY": 1,
+          "posX": 6,
+          "color": 16711680
+        },
+        {
+          "posY": 1,
+          "posX": 7,
+          "color": 255
+        },
+        {
+          "posY": 1,
+          "posX": 8,
+          "color": 255
+        },
+        {
+          "posY": 2,
+          "posX": 1,
+          "color": 255
+        },
+        {
+          "posY": 2,
+          "posX": 2,
+          "color": 16776960
+        },
+        {
+          "posY": 2,
+          "posX": 3,
+          "color": 16776960
+        },
+        {
+          "posY": 2,
+          "posX": 4,
+          "color": 16776960
+        },
+        {
+          "posY": 2,
+          "posX": 5,
+          "color": 255
+        },
+        {
+          "posY": 2,
+          "posX": 6,
+          "color": 16711680
+        },
+        {
+          "posY": 2,
+          "posX": 7,
+          "color": 16711680
+        },
+        {
+          "posY": 2,
+          "posX": 8,
+          "color": 16711680
+        }
+      ]
+    },
+    {
+      "viruses": [
+        {
+          "posY": 8,
+          "posX": 5,
+          "color": 255
+        },
+        {
+          "posY": 3,
+          "posX": 6,
+          "color": 16776960
+        },
+        {
+          "posY": 4,
+          "posX": 6,
+          "color": 255
+        },
+        {
+          "posY": 2,
+          "posX": 2,
+          "color": 255
+        },
+        {
+          "posY": 5,
+          "posX": 2,
+          "color": 16776960
+        },
+        {
+          "posY": 1,
+          "posX": 6,
+          "color": 255
+        },
+        {
+          "posY": 6,
+          "posX": 5,
+          "color": 16711680
+        },
+        {
+          "posY": 8,
+          "posX": 1,
+          "color": 16776960
+        },
+        {
+          "posY": 4,
+          "posX": 5,
+          "color": 16776960
+        }
+      ]
+    }
+  ]
+}
+mongoClient.connect("mongodb://" + "localhost" + "/" + "DrMario", function(err, db) {
+  if(err)
+    console.log(err)
+  else {
+    _db = db
+    opers.DeleteById(_db.collection(_coll), function(data) {
+      if(data == "DELETED") {
+        console.log("USUNIĘTO WSZYSTKO Z KOLEKCJI")
+        opers.Insert(_db.collection(_coll), viruses, function(data) {
+          if(data == "CREATED") {
+            console.log("DODANO DOKUMENT")
+          }
+          else {
+            console.log("NIE DODANO DOKUMENTU")
+          }
+        })
+      }
+      else {
+        console.log("NIE USUNIĘTO WSZYSTKIEGO Z KOLEKCJI")
+      }
+    })
+  }
+})
+
 // tablica z graczami
 const users = []
 
