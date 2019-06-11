@@ -6,7 +6,7 @@ class Net {
         this.which = null // który z kolei user
 
         this.client.on('both', data => {
-            const { which, nick, id, enemy } = data
+            const {which, nick, id, enemy} = data
             this.id = id
             this.enemy = enemy
             this.which = which
@@ -48,16 +48,18 @@ class Net {
             $('#menu').remove()
             game.enemyBottle = new Bottle(16, 10)
             game.scene.add(game.enemyBottle)
-            if (this.which % 2 == 0) { // pierwszy user
+            if(this.which % 2 == 0) { // pierwszy user
                 game.bottle.position.x = -240
                 game.enemyBottle.position.x = 60
+                net.divisor = data.divisor1
                 net.getViruses(data.level2, data.divisor2, 60, false)
                 net.getViruses(data.level1, data.divisor1, -240, true)
                 // game.play(settings.defaultSpeed)
             }
-            if (this.which % 2 == 1) { // drugi user
+            if(this.which % 2 == 1) { // drugi user
                 game.bottle.position.x = 60
                 game.enemyBottle.position.x = -240
+                net.divisor = data.divisor2
                 net.getViruses(data.level1, data.divisor1, -240, false)
                 net.getViruses(data.level2, data.divisor2, 60, true)
                 // game.play(settings.defaultSpeed)
@@ -65,7 +67,7 @@ class Net {
         })
 
         this.client.on('change', data => {
-            const { cellSize } = settings
+            const {cellSize} = settings
             const translation = this.which % 2 == 0 ? 60 : -240
             game.scene.remove(game.enemyPill)
             game.enemyPill = new Pill(data.half1color, data.half2color)
@@ -80,7 +82,7 @@ class Net {
         })
 
         this.client.on('nextPills', data => {
-            const { nextPillColors } = data
+            const {nextPillColors} = data
             const nextPills = [
                 new Pill(nextPillColors[0], nextPillColors[1]),
                 new Pill(nextPillColors[2], nextPillColors[3]),
@@ -96,30 +98,30 @@ class Net {
         })
 
         this.client.on('fly', data => {
-            const { startX, endX } = data
+            const {startX, endX} = data
             game.flyingPill = new Pill(data.color1, data.color2)
             game.flyingPill.position.set(startX, 165, 0)
             game.scene.add(game.flyingPill)
             let interval
             const parable = x => -0.03 * Math.pow(x - endX, 2) + 3.7 * (x - endX) + 300
             const reverseParable = x => -0.03 * Math.pow(x - endX, 2) - 3.7 * (x - endX) + 300
-            if (this.which % 2 == 0)
+            if(this.which % 2 == 0)
                 interval = setInterval(() => {
                     game.flyingPill.position.y = parable(game.flyingPill.position.x)
                     game.flyingPill.rotation.z -= Math.PI / 75
                     game.flyingPill.position.x--
-                    if (game.flyingPill.position.x == endX) {
+                    if(game.flyingPill.position.x == endX) {
                         game.flyingPill.position.y = 300
                         game.scene.remove(game.flyingPill)
                         clearInterval(interval)
                     }
                 }, 10)
-            else if (this.which % 2 == 1)
+            else if(this.which % 2 == 1)
                 interval = setInterval(() => {
                     game.flyingPill.position.y = reverseParable(game.flyingPill.position.x)
                     game.flyingPill.rotation.z += Math.PI / 75
                     game.flyingPill.position.x++
-                    if (game.flyingPill.position.x == endX) {
+                    if(game.flyingPill.position.x == endX) {
                         game.flyingPill.position.y = 300
                         game.scene.remove(game.flyingPill)
                         clearInterval(interval)
@@ -128,8 +130,8 @@ class Net {
         })
 
         this.client.on('pillsBoard', data => {
-            const { newPill } = data
-            const { cellSize } = settings
+            const {newPill} = data
+            const {cellSize} = settings
             const translation = this.which % 2 == 1 ? -240 : 60
             const pill = new Pill(newPill.color1, newPill.color2)
             game.enemyPillsBoard.push(pill)
@@ -149,20 +151,20 @@ class Net {
             const falling = (pill) => {
                 pill.children.forEach(half => {
                     game.enemyBottle.children.forEach(field => {
-                        if (field.posX == half.posX && field.posY == half.posY) {
+                        if(field.posX == half.posX && field.posY == half.posY) {
                             field.allow = false
                             field.color = half.color
                         }
                     })
                 })
                 let toDelete = []
-                for (let i = 0; i < pill.children.length; i++) {
+                for(let i = 0; i < pill.children.length; i++) {
                     checkRow(pill.children[i]).forEach(field => {
-                        if (!maybePushed(toDelete, field))
+                        if(!maybePushed(toDelete, field))
                             toDelete.push(field)
                     })
                     checkColumn(pill.children[i]).forEach(field => {
-                        if (!maybePushed(toDelete, field))
+                        if(!maybePushed(toDelete, field))
                             toDelete.push(field)
                     })
                 }
@@ -172,19 +174,19 @@ class Net {
                     field.color = "nothing" //sdfsdf
                     game.enemyPillsBoard.forEach(pill => {
                         pill.children.forEach(pillHalf => {
-                            if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
-                                if (!maybePushed(pillsToFall, pill)) {
+                            if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                                if(!maybePushed(pillsToFall, pill)) {
                                     pillsToFall.push(pill)
-                                    if (field.posY < whereToStart)
+                                    if(field.posY < whereToStart)
                                         whereToStart = field.posY
                                 }
                             }
                         })
                     })
                 })
-                if (pillsToFall.length > 0) {
-                    if (whereToStart != 15) {
-                        for (let i = whereToStart; i < 15; i++)
+                if(pillsToFall.length > 0) {
+                    if(whereToStart != 15) {
+                        for(let i = whereToStart; i < 15; i++)
                             analyzeNextRow(i)
                         deleteHalfs(toDelete)
                         keepProperPills(whereToStart)
@@ -194,23 +196,23 @@ class Net {
                                 game.enemyBottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
                             })
                         })
-                        if (pillsToFall.length > 0) {
+                        if(pillsToFall.length > 0) {
                             let interval = setInterval(() => {
-                                if (pillsToFall.length > 0) {
+                                if(pillsToFall.length > 0) {
                                     let pillsToDelete = []
                                     pillsToFall.forEach(pillToFall => {
                                         pillToFall.children.forEach((pillHalf, index) => {
-                                            if (!game.enemyBottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
+                                            if(!game.enemyBottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
                                                 let isToPush = true
                                                 pillsToDelete.forEach(pillToDelete => {
-                                                    if (pillToDelete.uuid == pillToFall.uuid)
+                                                    if(pillToDelete.uuid == pillToFall.uuid)
                                                         isToPush = false
                                                 })
-                                                if (isToPush) {
+                                                if(isToPush) {
                                                     pillsToDelete.push(pillToFall)
                                                     game.enemyBottle.fields[pillHalf.posY][pillHalf.posX].allow = false
                                                     game.enemyBottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
-                                                    if (pillToFall.children.length == 2) {
+                                                    if(pillToFall.children.length == 2) {
                                                         game.enemyBottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
                                                         game.enemyBottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].color = pillToFall.children[(index + 1) % 2].color
                                                     }
@@ -219,8 +221,8 @@ class Net {
                                         })
                                     })
                                     pillsToDelete.forEach(pillToDelete => {
-                                        for (let i = pillsToFall.length - 1; i >= 0; i--) {
-                                            if (pillToDelete.uuid == pillsToFall[i].uuid)
+                                        for(let i = pillsToFall.length - 1; i >= 0; i--) {
+                                            if(pillToDelete.uuid == pillsToFall[i].uuid)
                                                 pillsToFall.splice(i, 1)
                                         }
                                     })
@@ -230,7 +232,7 @@ class Net {
                                         })
                                         pillToFall.position.y -= 20
                                     })
-                                    if (pillsToFall.length == 0) {
+                                    if(pillsToFall.length == 0) {
                                         clearInterval(interval)
                                     }
                                 }
@@ -246,11 +248,11 @@ class Net {
             const checkRow = (half) => {
                 let remember = []
                 game.enemyBottle.fields[half.posY].forEach(element => {
-                    if (remember.length < 4 && element.color == half.color)
+                    if(remember.length < 4 && element.color == half.color)
                         remember.push(element)
-                    else if (remember.length < 4)
+                    else if(remember.length < 4)
                         remember = []
-                    else if (remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
+                    else if(remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
                         remember.push(element)
                 })
                 return remember
@@ -259,11 +261,11 @@ class Net {
             const checkColumn = (half) => {
                 let remember = []
                 game.enemyBottle.fields.forEach(element => {
-                    if (remember.length < 4 && element[half.posX].color == half.color)
+                    if(remember.length < 4 && element[half.posX].color == half.color)
                         remember.push(element[half.posX])
-                    else if (remember.length < 4)
+                    else if(remember.length < 4)
                         remember = []
-                    else if (remember.length >= 4 && element[half.posX].color == half.color && element[half.posX].posY == remember[remember.length - 1].posY + 1) {
+                    else if(remember.length >= 4 && element[half.posX].color == half.color && element[half.posX].posY == remember[remember.length - 1].posY + 1) {
                         remember.push(element[half.posX])
                     }
                 })
@@ -273,7 +275,7 @@ class Net {
             const maybePushed = (array, elementToCheck) => {
                 let agree = false
                 array.forEach(element => {
-                    if (element.uuid == elementToCheck.uuid)
+                    if(element.uuid == elementToCheck.uuid)
                         agree = true
                 })
                 return agree
@@ -282,7 +284,7 @@ class Net {
             const analyzeNextRow = (posY) => {
                 pillsToFall.forEach(pill => {
                     pill.children.forEach(pillHalf => {
-                        if (pillHalf.posY == posY) {
+                        if(pillHalf.posY == posY) {
                             let obj = {
                                 posY: posY,
                                 posX: pillHalf.posX
@@ -296,21 +298,21 @@ class Net {
             const checkUp = (position) => {
 
                 game.enemyPillsBoard.forEach(pill => {
-                    if (!maybePushed(pillsToFall, pill)) {
+                    if(!maybePushed(pillsToFall, pill)) {
                         pill.children.forEach((pillHalf, index) => {
-                            if (position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
-                                if (pill.children.length == 2) {
-                                    if (pill.children[(index + 1) % 2].posX == pillHalf.posX)
+                            if(position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
+                                if(pill.children.length == 2) {
+                                    if(pill.children[(index + 1) % 2].posX == pillHalf.posX)
                                         pillsToFall.push(pill)
                                     else {
                                         let obj = {
                                             posY: pill.children[(index + 1) % 2].posY,
                                             posX: pill.children[(index + 1) % 2].posX
                                         }
-                                        if (!checkUnderEmpty(obj))
+                                        if(!checkUnderEmpty(obj))
                                             pillsToFall.push(pill)
                                         else {
-                                            if (checkUnderParent(obj))
+                                            if(checkUnderParent(obj))
                                                 pillsToFall.push(pill)
                                         }
                                     }
@@ -327,7 +329,7 @@ class Net {
                 let agree = false
                 game.enemyPillsBoard.forEach(pill => {
                     pill.children.forEach(pillHalf => {
-                        if (position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
+                        if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                             agree = true
                     })
                 })
@@ -338,7 +340,7 @@ class Net {
                 let agree = false
                 pillsToFall.forEach(pill => {
                     pill.children.forEach(pillHalf => {
-                        if (position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
+                        if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                             agree = true
                     })
                 })
@@ -349,8 +351,8 @@ class Net {
                 toDelete.forEach(field => {
                     game.enemyPillsBoard.forEach(pill => {
                         pill.children.forEach((pillHalf, index) => {
-                            if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
-                                if (index == 0)
+                            if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                                if(index == 0)
                                     pill.children.shift()
                                 else
                                     pill.children.pop()
@@ -358,8 +360,8 @@ class Net {
                         })
                     })
                     game.allEnemyViruses.children.forEach((virus, index) => {
-                        if (virus.posY == field.posY && virus.posX == field.posX) {
-                            if (virus.posY < 14) {
+                        if(virus.posY == field.posY && virus.posX == field.posX) {
+                            if(virus.posY < 14) {
                                 let obj = {
                                     posY: virus.posY,
                                     posX: virus.posX
@@ -373,8 +375,8 @@ class Net {
             }
 
             const keepProperPills = (whereToStart) => {
-                for (let i = pillsToFall.length - 1; i >= 0; i--) {
-                    if (pillsToFall[i].children.length == 0)
+                for(let i = pillsToFall.length - 1; i >= 0; i--) {
+                    if(pillsToFall[i].children.length == 0)
                         pillsToFall.splice(i, 1)
                 }
             }
@@ -407,13 +409,14 @@ class Net {
             url: "http://localhost:3000/LOAD_LEVEL",
             data: {},
             method: "POST",
-            success: function (data) {
+            success: function(data) {
                 let obj = JSON.parse(data)
-                if (obj.actionBack == "CREATED") {
-                    if (start) {
+                if(obj.actionBack == "CREATED") {
+                    if(start) {
                         game.createYourViruses(obj.documents[0].board[level].viruses, positionX)
                         game.play(settings.defaultSpeed / divisor)
                         $('#menu').remove()
+                        $('#helpIMG').css("display", "block")
                         let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
                         $("#controls").append(dv)
                     }
@@ -424,7 +427,7 @@ class Net {
                 else
                     console.log("Nie udało sie pobrać dokumentów z bazy danych")
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.log(xhr)
             }
         })
