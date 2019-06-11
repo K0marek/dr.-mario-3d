@@ -51,12 +51,16 @@ class Net {
             if (this.which % 2 == 0) { // pierwszy user
                 game.bottle.position.x = -240
                 game.enemyBottle.position.x = 60
-                game.play(settings.defaultSpeed, -160)
+                net.getViruses(data.level2, data.divisor2, 60, false)
+                net.getViruses(data.level1, data.divisor1, -240, true)
+                // game.play(settings.defaultSpeed)
             }
             if (this.which % 2 == 1) { // drugi user
                 game.bottle.position.x = 60
                 game.enemyBottle.position.x = -240
-                game.play(settings.defaultSpeed, 140)
+                net.getViruses(data.level1, data.divisor1, -240, false)
+                net.getViruses(data.level2, data.divisor2, 60, true)
+                // game.play(settings.defaultSpeed)
             }
         })
 
@@ -353,6 +357,18 @@ class Net {
                             }
                         })
                     })
+                    game.allEnemyViruses.children.forEach((virus, index) => {
+                        if (virus.posY == field.posY && virus.posX == field.posX) {
+                            if (virus.posY < 14) {
+                                let obj = {
+                                    posY: virus.posY,
+                                    posX: virus.posX
+                                }
+                                checkUp(obj)
+                            }
+                            game.allEnemyViruses.children.splice(index, 1)
+                        }
+                    })
                 })
             }
 
@@ -386,20 +402,24 @@ class Net {
         })
     }
 
-    getViruses = level => {
+    getViruses = (level, divisor, positionX, start) => {
         $.ajax({
             url: "http://localhost:3000/LOAD_LEVEL",
             data: {},
             method: "POST",
             success: function (data) {
                 let obj = JSON.parse(data)
-                console.log(obj)
                 if (obj.actionBack == "CREATED") {
-                    game.createViruses(obj.documents[0].board[level].viruses)
-                    game.play(settings.defaultSpeed)
-                    $('#menu').remove()
-                    let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
-                    $("#controls").append(dv)
+                    if (start) {
+                        game.createYourViruses(obj.documents[0].board[level].viruses, positionX)
+                        game.play(settings.defaultSpeed / divisor)
+                        $('#menu').remove()
+                        let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
+                        $("#controls").append(dv)
+                    }
+                    else {
+                        game.createEnemyViruses(obj.documents[0].board[level].viruses, positionX)
+                    }
                 }
                 else
                     console.log("Nie udało sie pobrać dokumentów z bazy danych")

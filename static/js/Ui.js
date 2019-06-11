@@ -134,7 +134,11 @@ class Ui {
     //OBSŁUGA KLIKNIĘĆ
     interface = () => {
         $('#playButton').on('click', e => {
-            net.getViruses($("#level").val())
+            for (let i = 0; i < $("#speedButtons>button").length; i++) {
+                let bt = $("#speedButtons>button")[i]
+                if ($(bt).hasClass("btn-danger"))
+                    net.getViruses($("#level").val(), i + 1, -80, true)
+            }
         })
 
         $('#onePlayer').on('click', e => {
@@ -177,6 +181,21 @@ class Ui {
             })
         })
 
+        $('.speedButtons').on('click', e => {
+            $('.speedButtons')
+                .removeClass('btn-danger')
+                .addClass('btn-primary')
+            $(e.target)
+                .removeClass('btn-primary')
+                .addClass('btn-danger')
+
+            const value = e.target.value
+            net.client.emit('changeSpeedButtons', {
+                value,
+                enemy: net.enemy
+            })
+        })
+
         $('.speedButtons1p').on('click', e => {
             $('.speedButtons1p')
                 .removeClass('btn-danger')
@@ -208,10 +227,27 @@ class Ui {
         })
 
         $('#playButton2p').on('click', e => {
-            net.client.emit('startGame', {
-                id: net.id,
-                enemy: net.enemy
-            })
+            let divisor1
+            for (let i = 0; i < $("#speedButtons1p>button").length; i++) {
+                let bt = $("#speedButtons1p>button")[i]
+                if ($(bt).hasClass("btn-danger")) {
+                    divisor1 = i + 1
+                }
+            }
+            for (let i = 0; i < $("#speedButtons2p>button").length; i++) {
+                let bt = $("#speedButtons2p>button")[i]
+                if ($(bt).hasClass("btn-danger")) {
+                    net.client.emit('startGame', {
+                        id: net.id,
+                        enemy: net.enemy,
+                        level1: $("#level1p").val(),
+                        level2: $("#level2p").val(),
+                        divisor1: divisor1,
+                        divisor2: i + 1
+                    })
+                }
+                // net.getViruses($("#level1p").val(), i + 1)
+            }
         })
 
         $('#refresh').on('click', e => {
