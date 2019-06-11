@@ -39,8 +39,8 @@ class Game {
 
         this.clock = new THREE.Clock()
 
-        this.light = new Light()
-        this.scene.add(this.light.container)
+        const light = new Light(1.8)
+        this.scene.add(light)
 
         //tablica z kolorami następnych pilli do generowania ich
         this.nextPillColors = []
@@ -98,10 +98,6 @@ class Game {
     }
 
     randomColor = () => {
-        // let colors = [0xff0000]
-        // let random = Math.floor(Math.random() * 1)
-        // let colors = [0xff0000, 0x0000ff]
-        // let random = Math.floor(Math.random() * 2)
         let colors = [0xff0000, 0x0000ff, 0xffff00]
         let random = Math.floor(Math.random() * 3)
         return colors[random]
@@ -129,7 +125,7 @@ class Game {
                         clearInterval(interval)
                         fall()
                     }
-                }, 10)
+                }, 8)
             else if (net.which % 2 == 0)
                 interval = setInterval(() => {
                     this.pill.position.y = reverseParable(this.pill.position.x)
@@ -141,12 +137,12 @@ class Game {
                         clearInterval(interval)
                         fall()
                     }
-                }, 10)
+                }, 8)
         }
 
         const nextPill = () => {
 
-            //this.mario.throwPill()
+            this.mario.throwPill()
 
             for (let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
                 if (this.pillsContainer.children[i].children.length == 0)
@@ -541,8 +537,11 @@ class Game {
             })
         })
         if (this.numberOfViruses == 0) {
+            ui.win()
+            net.client.emit('lose', {
+                enemy: net.enemy,
+            })
             this.continueGame = false
-            alert("WYGRAŁEŚ")
         }
     }
 

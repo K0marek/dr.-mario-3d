@@ -113,7 +113,7 @@ class Net {
                         game.scene.remove(game.flyingPill)
                         clearInterval(interval)
                     }
-                }, 10)
+                }, 8)
             else if (this.which % 2 == 1)
                 interval = setInterval(() => {
                     game.flyingPill.position.y = reverseParable(game.flyingPill.position.x)
@@ -124,7 +124,7 @@ class Net {
                         game.scene.remove(game.flyingPill)
                         clearInterval(interval)
                     }
-                }, 10)
+                }, 8)
         })
 
         this.client.on('pillsBoard', data => {
@@ -404,7 +404,7 @@ class Net {
 
     getViruses = (level, divisor, positionX, start) => {
         $.ajax({
-            url: "http://localhost:3000/LOAD_LEVEL",
+            url: "http://192.168.2.75:3000/LOAD_LEVEL",
             data: {},
             method: "POST",
             success: function (data) {

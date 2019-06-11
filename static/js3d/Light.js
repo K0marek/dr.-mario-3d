@@ -1,17 +1,16 @@
-class Light {
-    constructor() {
-        this.container = new THREE.Object3D()
-
+class Light extends THREE.Object3D {
+    constructor(power = 1) {
+        super()
+        this.power = power
         this.init()
     }
 
     init() {
-        this.light = new THREE.PointLight(0xffffff, 1, 1000)
-        this.light.position.set(0, 200, 200)
-        this.container.add(this.light)
+        this.light = new THREE.AmbientLight(0xffffff, this.power)
+        this.add(this.light)
     }
 
     getLight() {
-        return this.containter
+        return this
     }
 }

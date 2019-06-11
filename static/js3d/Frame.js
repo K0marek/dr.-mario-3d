@@ -6,7 +6,7 @@ class Frame extends THREE.Mesh {
 
         super()
 
-        const {cellSize} = settings
+        const { cellSize } = settings
 
         this.geometry = new THREE.BoxGeometry(cellSize, cellSize, cellSize, 1, 1, 1)
         this.material = new THREE.MeshBasicMaterial({
@@ -17,7 +17,7 @@ class Frame extends THREE.Mesh {
         this.posX = posX
         this.posY = posY
         this.allow = false
-        if(posY == 16 && (posX < 2 || posX > 7))
+        if (posY == 16 && (posX < 2 || posX > 7))
             this.visible = false
 
         return this
