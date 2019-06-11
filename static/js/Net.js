@@ -407,7 +407,7 @@ class Net {
 
     getViruses = (level, divisor, positionX, start) => {
         $.ajax({
-            url: "http://192.168.2.75:3000/LOAD_LEVEL",
+            url: "http://192.168.2.91:3000/LOAD_LEVEL",
             data: {},
             method: "POST",
             success: function (data) {
