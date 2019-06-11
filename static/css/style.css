@@ -11,6 +11,38 @@ body {
 
 #score {
     color: white;
+    position: absolute;
+    right: 20px;
+}
+
+#helper {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+}
+
+#helper>div {
+    width: 330px;
+    float: left;
+}
+
+#helper>img {
+    display: none;
+    width: 50px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#helper>img:hover {
+    cursor: pointer;
+}
+
+#helpInfo {
+    color: white;
+    display: none;
+    z-index: 55;
 }
 
 #menu {

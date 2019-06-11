@@ -127,6 +127,7 @@ class Game {
                     }
                 }, 8)
             else if (net.which % 2 == 0)
+
                 interval = setInterval(() => {
                     this.pill.position.y = reverseParable(this.pill.position.x)
                     this.pill.rotation.z += Math.PI / 75
@@ -252,7 +253,7 @@ class Game {
                     else {
                         this.falling(this.pill)
                         nextPill()
-                        this.speed = settings.defaultSpeed
+                        this.speed = speed
                         return
                     }
                 }
@@ -303,7 +304,7 @@ class Game {
         let whereToStart = 15
         toDelete.forEach(field => {
             field.allow = true
-            field.color = "nothing" //sdfsdf
+            field.color = "nothing"
             this.pillsContainer.children.forEach(pill => {
                 pill.children.forEach(pillHalf => {
                     if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {

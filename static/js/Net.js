@@ -51,6 +51,7 @@ class Net {
             if (this.which % 2 == 0) { // pierwszy user
                 game.bottle.position.x = -240
                 game.enemyBottle.position.x = 60
+                net.divisor = data.divisor1
                 net.getViruses(data.level2, data.divisor2, 60, false)
                 net.getViruses(data.level1, data.divisor1, -240, true)
                 // game.play(settings.defaultSpeed)
@@ -58,6 +59,7 @@ class Net {
             if (this.which % 2 == 1) { // drugi user
                 game.bottle.position.x = 60
                 game.enemyBottle.position.x = -240
+                net.divisor = data.divisor2
                 net.getViruses(data.level1, data.divisor1, -240, false)
                 net.getViruses(data.level2, data.divisor2, 60, true)
                 // game.play(settings.defaultSpeed)
@@ -115,6 +117,7 @@ class Net {
                     }
                 }, 8)
             else if (this.which % 2 == 1)
+
                 interval = setInterval(() => {
                     game.flyingPill.position.y = reverseParable(game.flyingPill.position.x)
                     game.flyingPill.rotation.z += Math.PI / 75
@@ -414,6 +417,7 @@ class Net {
                         game.createYourViruses(obj.documents[0].board[level].viruses, positionX)
                         game.play(settings.defaultSpeed / divisor)
                         $('#menu').remove()
+                        $('#helpIMG').css("display", "block")
                         let dv = $("<div>").text("Twój wynik: 0").prop("id", "score")
                         $("#controls").append(dv)
                     }
