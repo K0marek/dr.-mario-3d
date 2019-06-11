@@ -44,7 +44,7 @@ class Game {
 
         //tablica z kolorami następnych pilli do generowania ich
         this.nextPillColors = []
-        for (let i = 0; i < 6; i++) {
+        for(let i = 0; i < 6; i++) {
             this.nextPillColors.push(this.randomColor())
         }
 
@@ -62,7 +62,7 @@ class Game {
         // tablica będąca odzwierciedleniem pilli na planszy
         this.pillsBoard = this.bottle.fields.map(row => {
             return row.map(item => {
-                if (item.allow)
+                if(item.allow)
                     return 0
                 else
                     return 1 // jeżeli pole to część ramki (zajęte) wstawiam tam 1
@@ -89,7 +89,7 @@ class Game {
 
     render() {
 
-        if (this.mario.loaded)
+        if(this.mario.loaded)
             this.mario.updateModel()
 
         requestAnimationFrame(this.render.bind(this))
@@ -118,24 +118,24 @@ class Game {
             const parable = x => -0.03 * Math.pow(x - startX, 2) + 3.7 * (x - startX) + 300
             const reverseParable = x => -0.03 * Math.pow(x - startX, 2) - 3.7 * (x - startX) + 300
             let interval
-            if (net.which % 2 == 1 || net.which == null)
+            if(net.which % 2 == 1 || net.which == null)
                 interval = setInterval(() => {
                     this.pill.position.y = parable(this.pill.position.x)
                     this.pill.rotation.z -= Math.PI / 75
                     this.pill.position.x--
-                    if (this.pill.position.x == startX) {
+                    if(this.pill.position.x == startX) {
                         this.pill.position.y = 300
                         this.isPillFlying = false
                         clearInterval(interval)
                         fall()
                     }
                 }, 10)
-            else if (net.which % 2 == 0)
+            else if(net.which % 2 == 0)
                 interval = setInterval(() => {
                     this.pill.position.y = reverseParable(this.pill.position.x)
                     this.pill.rotation.z += Math.PI / 75
                     this.pill.position.x++
-                    if (this.pill.position.x == startX) {
+                    if(this.pill.position.x == startX) {
                         this.pill.position.y = 300
                         this.isPillFlying = false
                         clearInterval(interval)
@@ -148,8 +148,8 @@ class Game {
 
             //this.mario.throwPill()
 
-            for (let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
-                if (this.pillsContainer.children[i].children.length == 0)
+            for(let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
+                if(this.pillsContainer.children[i].children.length == 0)
                     this.pillsContainer.children.splice(i, 1)
             }
 
@@ -171,12 +171,12 @@ class Game {
                 item.position.set(0, 40 - index * settings.cellSize, 0)
             })
             this.scene.add(this.nextPillsContainer)
-            if (net.enemy == null) // pozycja dla jednego gracza
+            if(net.enemy == null) // pozycja dla jednego gracza
                 this.nextPillsContainer.position.set(150, 120, 0)
             else // pozycja dla 2 graczy zależy od tego który z kolei jest to podłączony gracz
                 this.nextPillsContainer.position.set(net.which % 2 == 0 ? -310 : 290, 120, 0)
 
-            if (net.enemy == null) {
+            if(net.enemy == null) {
                 this.pill.position.x = 150
                 this.pill.position.y = 165
                 fly(0)
@@ -217,13 +217,13 @@ class Game {
                 pillRotation: this.pill.rotation.z
             })
             setTimeout(() => {
-                const { fields } = this.bottle
+                const {fields} = this.bottle
                 let end = false
                 this.pill.children.forEach(half => {
-                    if (!fields[half.posY - 1][half.posX].allow)
+                    if(!fields[half.posY - 1][half.posX].allow)
                         end = true
                 })
-                if (end) {
+                if(end) {
                     // informacje o każdej części pilla zapisuje w tablicy this.pillsBoard
                     this.pillsBoard[this.pill.half1.posY][this.pill.half1.posX] = {
                         pos1X: this.pill.half1.posX,
@@ -246,7 +246,7 @@ class Game {
                             pillRotation: this.pill.rotation.z
                         }
                     })
-                    if (!this.checkEndGame(this.pill)) {
+                    if(!this.checkEndGame(this.pill)) {
                         ui.lose()
                         net.client.emit('win', {
                             enemy: net.enemy,
@@ -256,7 +256,7 @@ class Game {
                     else {
                         this.falling(this.pill)
                         nextPill()
-                        this.speed = settings.defaultSpeed
+                        this.speed = speed
                         return
                     }
                 }
@@ -267,13 +267,13 @@ class Game {
                     this.pill.position.y -= 20
                 }
 
-                if (this.continueGame) {
-                    if (this.pillsToFall.length == 0) {
+                if(this.continueGame) {
+                    if(this.pillsToFall.length == 0) {
                         fall()
                     }
                     else {
                         let interval = setInterval(() => {
-                            if (this.pillsToFall.length == 0) {
+                            if(this.pillsToFall.length == 0) {
                                 clearInterval(interval)
                                 fall()
                             }
@@ -287,42 +287,42 @@ class Game {
     falling = (pill) => {
         pill.children.forEach(half => {
             this.bottle.children.forEach(field => {
-                if (field.posX == half.posX && field.posY == half.posY) {
+                if(field.posX == half.posX && field.posY == half.posY) {
                     field.allow = false
                     field.color = half.color
                 }
             })
         })
         let toDelete = []
-        for (let i = 0; i < pill.children.length; i++) {
+        for(let i = 0; i < pill.children.length; i++) {
             this.checkRow(pill.children[i]).forEach(field => {
-                if (!this.maybePushed(toDelete, field))
+                if(!this.maybePushed(toDelete, field))
                     toDelete.push(field)
             })
             this.checkColumn(pill.children[i]).forEach(field => {
-                if (!this.maybePushed(toDelete, field))
+                if(!this.maybePushed(toDelete, field))
                     toDelete.push(field)
             })
         }
         let whereToStart = 15
         toDelete.forEach(field => {
             field.allow = true
-            field.color = "nothing" //sdfsdf
+            field.color = "nothing"
             this.pillsContainer.children.forEach(pill => {
                 pill.children.forEach(pillHalf => {
-                    if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
-                        if (!this.maybePushed(this.pillsToFall, pill)) {
+                    if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                        if(!this.maybePushed(this.pillsToFall, pill)) {
                             this.pillsToFall.push(pill)
-                            if (field.posY < whereToStart)
+                            if(field.posY < whereToStart)
                                 whereToStart = field.posY
                         }
                     }
                 })
             })
         })
-        if (this.pillsToFall.length > 0) {
-            if (whereToStart != 15) {
-                for (let i = whereToStart; i < 15; i++)
+        if(this.pillsToFall.length > 0) {
+            if(whereToStart != 15) {
+                for(let i = whereToStart; i < 15; i++)
                     this.analyzeNextRow(i)
                 this.deleteHalfs(toDelete)
                 this.keepProperPills(whereToStart)
@@ -332,23 +332,23 @@ class Game {
                         this.bottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
                     })
                 })
-                if (this.pillsToFall.length > 0) {
+                if(this.pillsToFall.length > 0) {
                     let interval = setInterval(() => {
-                        if (this.pillsToFall.length > 0) {
+                        if(this.pillsToFall.length > 0) {
                             let pillsToDelete = []
                             this.pillsToFall.forEach(pillToFall => {
                                 pillToFall.children.forEach((pillHalf, index) => {
-                                    if (!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
+                                    if(!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
                                         let isToPush = true
                                         pillsToDelete.forEach(pillToDelete => {
-                                            if (pillToDelete.uuid == pillToFall.uuid)
+                                            if(pillToDelete.uuid == pillToFall.uuid)
                                                 isToPush = false
                                         })
-                                        if (isToPush) {
+                                        if(isToPush) {
                                             pillsToDelete.push(pillToFall)
                                             this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
                                             this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
-                                            if (pillToFall.children.length == 2) {
+                                            if(pillToFall.children.length == 2) {
                                                 this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
                                                 this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].color = pillToFall.children[(index + 1) % 2].color
                                             }
@@ -357,8 +357,8 @@ class Game {
                                 })
                             })
                             pillsToDelete.forEach(pillToDelete => {
-                                for (let i = this.pillsToFall.length - 1; i >= 0; i--) {
-                                    if (pillToDelete.uuid == this.pillsToFall[i].uuid)
+                                for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
+                                    if(pillToDelete.uuid == this.pillsToFall[i].uuid)
                                         this.pillsToFall.splice(i, 1)
                                 }
                             })
@@ -368,7 +368,7 @@ class Game {
                                 })
                                 pillToFall.position.y -= 20
                             })
-                            if (this.pillsToFall.length == 0) {
+                            if(this.pillsToFall.length == 0) {
                                 clearInterval(interval)
                             }
                         }
@@ -380,7 +380,7 @@ class Game {
             }
         }
         else {
-            if (!this.checkEndGame(this.pill)) {
+            if(!this.checkEndGame(this.pill)) {
                 ui.lose()
                 net.client.emit('win', {
                     enemy: net.enemy,
@@ -392,17 +392,17 @@ class Game {
 
     checkPossibility = (sign) => {
         let agree = null
-        const { fields } = this.bottle
-        const { half1, half2 } = this.pill
+        const {fields} = this.bottle
+        const {half1, half2} = this.pill
 
-        if (sign == '-') {
-            if (fields[half1.posY][half1.posX - 1].allow && fields[half2.posY][half2.posX - 1].allow)
+        if(sign == '-') {
+            if(fields[half1.posY][half1.posX - 1].allow && fields[half2.posY][half2.posX - 1].allow)
                 agree = true
             else
                 agree = false
         }
-        else if (sign == '+') {
-            if (fields[half1.posY][half1.posX + 1].allow && fields[half2.posY][half2.posX + 1].allow)
+        else if(sign == '+') {
+            if(fields[half1.posY][half1.posX + 1].allow && fields[half2.posY][half2.posX + 1].allow)
                 agree = true
             else
                 agree = false
@@ -413,11 +413,11 @@ class Game {
     checkRow = (half) => {
         let remember = []
         this.bottle.fields[half.posY].forEach(element => {
-            if (remember.length < 4 && element.color == half.color)
+            if(remember.length < 4 && element.color == half.color)
                 remember.push(element)
-            else if (remember.length < 4)
+            else if(remember.length < 4)
                 remember = []
-            else if (remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
+            else if(remember.length >= 4 && element.color == half.color && element.posX == remember[remember.length - 1].posX + 1)
                 remember.push(element)
         })
         return remember
@@ -426,11 +426,11 @@ class Game {
     checkColumn = (half) => {
         let remember = []
         this.bottle.fields.forEach(element => {
-            if (remember.length < 4 && element[half.posX].color == half.color)
+            if(remember.length < 4 && element[half.posX].color == half.color)
                 remember.push(element[half.posX])
-            else if (remember.length < 4)
+            else if(remember.length < 4)
                 remember = []
-            else if (remember.length >= 4 && element[half.posX].color == half.color && element[half.posX].posY == remember[remember.length - 1].posY + 1) {
+            else if(remember.length >= 4 && element[half.posX].color == half.color && element[half.posX].posY == remember[remember.length - 1].posY + 1) {
                 remember.push(element[half.posX])
             }
         })
@@ -440,7 +440,7 @@ class Game {
     maybePushed = (array, elementToCheck) => {
         let agree = false
         array.forEach(element => {
-            if (element.uuid == elementToCheck.uuid)
+            if(element.uuid == elementToCheck.uuid)
                 agree = true
         })
         return agree
@@ -449,7 +449,7 @@ class Game {
     analyzeNextRow = (posY) => {
         this.pillsToFall.forEach(pill => {
             pill.children.forEach(pillHalf => {
-                if (pillHalf.posY == posY) {
+                if(pillHalf.posY == posY) {
                     let obj = {
                         posY: posY,
                         posX: pillHalf.posX
@@ -463,21 +463,21 @@ class Game {
     checkUp = (position) => {
 
         this.pillsContainer.children.forEach(pill => {
-            if (!this.maybePushed(this.pillsToFall, pill)) {
+            if(!this.maybePushed(this.pillsToFall, pill)) {
                 pill.children.forEach((pillHalf, index) => {
-                    if (position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
-                        if (pill.children.length == 2) {
-                            if (pill.children[(index + 1) % 2].posX == pillHalf.posX)
+                    if(position.posY + 1 == pillHalf.posY && position.posX == pillHalf.posX) {
+                        if(pill.children.length == 2) {
+                            if(pill.children[(index + 1) % 2].posX == pillHalf.posX)
                                 this.pillsToFall.push(pill)
                             else {
                                 let obj = {
                                     posY: pill.children[(index + 1) % 2].posY,
                                     posX: pill.children[(index + 1) % 2].posX
                                 }
-                                if (!this.checkUnderEmpty(obj))
+                                if(!this.checkUnderEmpty(obj))
                                     this.pillsToFall.push(pill)
                                 else {
-                                    if (this.checkUnderParent(obj))
+                                    if(this.checkUnderParent(obj))
                                         this.pillsToFall.push(pill)
                                 }
                             }
@@ -494,7 +494,7 @@ class Game {
         let agree = false
         this.pillsContainer.children.forEach(pill => {
             pill.children.forEach(pillHalf => {
-                if (position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
+                if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                     agree = true
             })
         })
@@ -505,7 +505,7 @@ class Game {
         let agree = false
         this.pillsToFall.forEach(pill => {
             pill.children.forEach(pillHalf => {
-                if (position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
+                if(position.posY - 1 == pillHalf.posY && position.posX == pillHalf.posX)
                     agree = true
             })
         })
@@ -518,8 +518,8 @@ class Game {
         toDelete.forEach(field => {
             this.pillsContainer.children.forEach(pill => {
                 pill.children.forEach((pillHalf, index) => {
-                    if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
-                        if (index == 0)
+                    if(pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                        if(index == 0)
                             pill.children.shift()
                         else
                             pill.children.pop()
@@ -527,8 +527,8 @@ class Game {
                 })
             })
             this.allYourViruses.children.forEach((virus, index) => {
-                if (virus.posY == field.posY && virus.posX == field.posX) {
-                    if (virus.posY < 14) {
+                if(virus.posY == field.posY && virus.posX == field.posX) {
+                    if(virus.posY < 14) {
                         let obj = {
                             posY: virus.posY,
                             posX: virus.posX
@@ -540,15 +540,15 @@ class Game {
                 }
             })
         })
-        if (this.numberOfViruses == 0) {
-            this.continueGame = false
-            alert("WYGRAŁEŚ")
-        }
+        // if (this.numberOfViruses == 0) {
+        //     this.continueGame = false
+        //     alert("WYGRAŁEŚ")
+        // }
     }
 
     keepProperPills = (whereToStart) => {
-        for (let i = this.pillsToFall.length - 1; i >= 0; i--) {
-            if (this.pillsToFall[i].children.length == 0)
+        for(let i = this.pillsToFall.length - 1; i >= 0; i--) {
+            if(this.pillsToFall[i].children.length == 0)
                 this.pillsToFall.splice(i, 1)
             // else {
             //     let agree = false
@@ -578,7 +578,7 @@ class Game {
     checkEndGame = (pill) => {
         let agree = true
         pill.children.forEach(pillHalf => {
-            if (pillHalf.posY >= 15)
+            if(pillHalf.posY >= 15)
                 agree = false
         })
         return agree
