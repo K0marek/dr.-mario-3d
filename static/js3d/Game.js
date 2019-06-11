@@ -68,6 +68,9 @@ class Game {
             })
         })
 
+        // zmienna która określa czy pill jest w trakcie lotu (wtedy nie działa sterowanie)
+        this.isPillFlying = false
+
         //tablica przeciwnika
         this.enemyPillsBoard = []
 
@@ -110,6 +113,7 @@ class Game {
         this.continueGame = true
 
         const fly = startX => {
+            this.isPillFlying = true
             const parable = x => -0.03 * Math.pow(x - startX, 2) + 3.7 * (x - startX) + 300
             const reverseParable = x => -0.03 * Math.pow(x - startX, 2) - 3.7 * (x - startX) + 300
             let interval
@@ -120,6 +124,7 @@ class Game {
                     this.pill.position.x--
                     if (this.pill.position.x == startX) {
                         this.pill.position.y = 300
+                        this.isPillFlying = false
                         clearInterval(interval)
                         fall()
                     }
@@ -131,6 +136,7 @@ class Game {
                     this.pill.position.x++
                     if (this.pill.position.x == startX) {
                         this.pill.position.y = 300
+                        this.isPillFlying = false
                         clearInterval(interval)
                         fall()
                     }
@@ -139,7 +145,7 @@ class Game {
 
         const nextPill = () => {
 
-            this.mario.throwPill()
+            //this.mario.throwPill()
 
             for (let i = this.pillsContainer.children.length - 1; i >= 0; i--) {
                 if (this.pillsContainer.children[i].children.length == 0)
@@ -201,8 +207,10 @@ class Game {
             this.pillsContainer.add(this.pill)
             net.client.emit('change', {
                 enemy: net.enemy,
-                posX: this.pill.half1.posX,
-                posY: this.pill.half1.posY,
+                pos1X: this.pill.half1.posX,
+                pos1Y: this.pill.half1.posY,
+                pos2X: this.pill.half2.posX,
+                pos2Y: this.pill.half2.posY,
                 half1color: this.pill.color1,
                 half2color: this.pill.color2,
                 pillRotation: this.pill.rotation.z
@@ -217,22 +225,35 @@ class Game {
                 if (end) {
                     // informacje o każdej części pilla zapisuje w tablicy this.pillsBoard
                     this.pillsBoard[this.pill.half1.posY][this.pill.half1.posX] = {
-                        posX: this.pill.position.x,
-                        posY: this.pill.position.y,
+                        pos1X: this.pill.half1.posX,
+                        pos1Y: this.pill.half1.posY,
+                        pos2X: this.pill.half2.posX,
+                        pos2Y: this.pill.half2.posY,
                         color1: this.pill.color1,
                         color2: this.pill.color2,
                         pillRotation: this.pill.rotation.z
                     }
                     net.client.emit('pillsBoard', {
                         enemy: net.enemy,
-                        pillsBoard: this.pillsBoard
+                        newPill: {
+                            pos1X: this.pill.half1.posX,
+                            pos1Y: this.pill.half1.posY,
+                            pos2X: this.pill.half2.posX,
+                            pos2Y: this.pill.half2.posY,
+                            color1: this.pill.color1,
+                            color2: this.pill.color2,
+                            pillRotation: this.pill.rotation.z
+                        }
                     })
                     if (!this.checkEndGame(this.pill)) {
-                        alert($("#score").text())
+                        ui.lose()
+                        net.client.emit('win', {
+                            enemy: net.enemy,
+                        })
                         this.continueGame = false
                     }
                     else {
-                        falling(this.pill)
+                        this.falling(this.pill)
                         nextPill()
                         this.speed = settings.defaultSpeed
                         return
@@ -261,110 +282,109 @@ class Game {
             }, this.speed)
         }
 
-        const falling = (pill) => {
-            pill.children.forEach(half => {
-                this.bottle.children.forEach(field => {
-                    if (field.posX == half.posX && field.posY == half.posY) {
-                        field.allow = false
-                        field.color = half.color
+    }
+
+    falling = (pill) => {
+        pill.children.forEach(half => {
+            this.bottle.children.forEach(field => {
+                if (field.posX == half.posX && field.posY == half.posY) {
+                    field.allow = false
+                    field.color = half.color
+                }
+            })
+        })
+        let toDelete = []
+        for (let i = 0; i < pill.children.length; i++) {
+            this.checkRow(pill.children[i]).forEach(field => {
+                if (!this.maybePushed(toDelete, field))
+                    toDelete.push(field)
+            })
+            this.checkColumn(pill.children[i]).forEach(field => {
+                if (!this.maybePushed(toDelete, field))
+                    toDelete.push(field)
+            })
+        }
+        let whereToStart = 15
+        toDelete.forEach(field => {
+            field.allow = true
+            field.color = "nothing" //sdfsdf
+            this.pillsContainer.children.forEach(pill => {
+                pill.children.forEach(pillHalf => {
+                    if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
+                        if (!this.maybePushed(this.pillsToFall, pill)) {
+                            this.pillsToFall.push(pill)
+                            if (field.posY < whereToStart)
+                                whereToStart = field.posY
+                        }
                     }
                 })
             })
-            let toDelete = []
-            for (let i = 0; i < pill.children.length; i++) {
-                this.checkRow(pill.children[i]).forEach(field => {
-                    if (!this.maybePushed(toDelete, field))
-                        toDelete.push(field)
-                })
-                this.checkColumn(pill.children[i]).forEach(field => {
-                    if (!this.maybePushed(toDelete, field))
-                        toDelete.push(field)
-                })
-            }
-            let whereToStart = 15
-            toDelete.forEach(field => {
-                field.allow = true
-                field.color = "nothing" //sdfsdf
-                this.pillsContainer.children.forEach(pill => {
+        })
+        if (this.pillsToFall.length > 0) {
+            if (whereToStart != 15) {
+                for (let i = whereToStart; i < 15; i++)
+                    this.analyzeNextRow(i)
+                this.deleteHalfs(toDelete)
+                this.keepProperPills(whereToStart)
+                this.pillsToFall.forEach(pill => {
                     pill.children.forEach(pillHalf => {
-                        if (pillHalf.posY == field.posY && pillHalf.posX == field.posX) {
-                            if (!this.maybePushed(this.pillsToFall, pill)) {
-                                this.pillsToFall.push(pill)
-                                if (field.posY < whereToStart)
-                                    whereToStart = field.posY
-                            }
-                        }
+                        this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = true
+                        this.bottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
                     })
                 })
-            })
-            if (this.pillsToFall.length > 0) {
-                if (whereToStart != 15) {
-                    for (let i = whereToStart; i < 15; i++)
-                        this.analyzeNextRow(i)
-                    this.deleteHalfs(toDelete)
-                    this.keepProperPills(whereToStart)
-                    this.pillsToFall.forEach(pill => {
-                        pill.children.forEach(pillHalf => {
-                            this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = true
-                            this.bottle.fields[pillHalf.posY][pillHalf.posX].color = "nothing"
-                        })
-                    })
-                    if (this.pillsToFall.length > 0) {
-                        let interval = setInterval(() => {
-                            if (this.pillsToFall.length > 0) {
-                                let pillsToDelete = []
-                                this.pillsToFall.forEach(pillToFall => {
-                                    pillToFall.children.forEach((pillHalf, index) => {
-                                        if (!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
-                                            let isToPush = true
-                                            pillsToDelete.forEach(pillToDelete => {
-                                                if (pillToDelete.uuid == pillToFall.uuid)
-                                                    isToPush = false
-                                            })
-                                            if (isToPush) {
-                                                pillsToDelete.push(pillToFall)
-                                                // falling(pillToFall)
-                                                this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
-                                                this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
-                                                if (pillToFall.children.length == 2) {
-                                                    this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
-                                                    this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].color = pillToFall.children[(index + 1) % 2].color
-                                                }
+                if (this.pillsToFall.length > 0) {
+                    let interval = setInterval(() => {
+                        if (this.pillsToFall.length > 0) {
+                            let pillsToDelete = []
+                            this.pillsToFall.forEach(pillToFall => {
+                                pillToFall.children.forEach((pillHalf, index) => {
+                                    if (!this.bottle.fields[pillHalf.posY - 1][pillHalf.posX].allow) {
+                                        let isToPush = true
+                                        pillsToDelete.forEach(pillToDelete => {
+                                            if (pillToDelete.uuid == pillToFall.uuid)
+                                                isToPush = false
+                                        })
+                                        if (isToPush) {
+                                            pillsToDelete.push(pillToFall)
+                                            this.bottle.fields[pillHalf.posY][pillHalf.posX].allow = false
+                                            this.bottle.fields[pillHalf.posY][pillHalf.posX].color = pillHalf.color
+                                            if (pillToFall.children.length == 2) {
+                                                this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].allow = false
+                                                this.bottle.fields[pillToFall.children[(index + 1) % 2].posY][pillToFall.children[(index + 1) % 2].posX].color = pillToFall.children[(index + 1) % 2].color
                                             }
                                         }
-                                    })
-                                })
-                                pillsToDelete.forEach(pillToDelete => {
-                                    for (let i = this.pillsToFall.length - 1; i >= 0; i--) {
-                                        if (pillToDelete.uuid == this.pillsToFall[i].uuid)
-                                            this.pillsToFall.splice(i, 1)
                                     }
                                 })
-                                this.pillsToFall.forEach(pillToFall => {
-                                    pillToFall.children.forEach(pillHalf => {
-                                        pillHalf.posY--
-                                    })
-                                    pillToFall.position.y -= 20
-                                })
-                                if (this.pillsToFall.length == 0) {
-                                    clearInterval(interval)
+                            })
+                            pillsToDelete.forEach(pillToDelete => {
+                                for (let i = this.pillsToFall.length - 1; i >= 0; i--) {
+                                    if (pillToDelete.uuid == this.pillsToFall[i].uuid)
+                                        this.pillsToFall.splice(i, 1)
                                 }
-                            }
-                            else {
+                            })
+                            this.pillsToFall.forEach(pillToFall => {
+                                pillToFall.children.forEach(pillHalf => {
+                                    pillHalf.posY--
+                                })
+                                pillToFall.position.y -= 20
+                            })
+                            if (this.pillsToFall.length == 0) {
                                 clearInterval(interval)
                             }
-                        }, 500)
-                    }
-                }
-            }
-            else {
-                if (!this.checkEndGame(this.pill)) {
-                    alert($("#score").text())
-                    this.continueGame = false
+                        }
+                        else {
+                            clearInterval(interval)
+                        }
+                    }, 500)
                 }
             }
         }
-
+        else {
+            if (!this.checkEndGame(this.pill)) {
+                alert($("#score").text())
+                this.continueGame = false
+            }
+        }
     }
 
     checkPossibility = (sign) => {

@@ -114,5 +114,13 @@ socketio.on("connection", function (client) {
       socketio.sockets.to(data.enemy).emit('pillsBoard', data)
     })
 
+    client.on('win', data => {
+      socketio.sockets.to(data.enemy).emit('win', data)
+    })
+
+    client.on('lose', data => {
+      socketio.sockets.to(data.enemy).emit('lose', data)
+    })
+
   })
 })
