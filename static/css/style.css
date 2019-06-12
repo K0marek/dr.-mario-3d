@@ -91,3 +91,26 @@ body {
 .selecte {
     background-color: red;
 }
+
+#scoreTable {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 50px;
+    border: 5px solid #00806a;
+    background-color: black;
+    text-align: center;
+    font-size: 36px;
+    color: #00806a;
+}
+
+#deleteButton {
+    position: absolute;
+    top: 50px;
+    left: 70%;
+    color: white;
+}

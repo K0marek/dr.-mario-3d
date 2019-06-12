@@ -103,6 +103,9 @@ class Game {
         return colors[random]
     }
 
+    parable = (x, startX) => -0.03 * Math.pow(x - startX, 2) + 3.7 * (x - startX) + 300
+    reverseParable = (x, startX) => -0.03 * Math.pow(x - startX, 2) - 3.7 * (x - startX) + 300
+
     play = (speed) => {
         this.speed = speed
         this.pillsToFall = []
@@ -111,12 +114,10 @@ class Game {
 
         const fly = startX => {
             this.isPillFlying = true
-            const parable = x => -0.03 * Math.pow(x - startX, 2) + 3.7 * (x - startX) + 300
-            const reverseParable = x => -0.03 * Math.pow(x - startX, 2) - 3.7 * (x - startX) + 300
             let interval
             if (net.which % 2 == 1 || net.which == null)
                 interval = setInterval(() => {
-                    this.pill.position.y = parable(this.pill.position.x)
+                    this.pill.position.y = this.parable(this.pill.position.x, startX)
                     this.pill.rotation.z -= Math.PI / 75
                     this.pill.position.x--
                     if (this.pill.position.x == startX) {
@@ -129,7 +130,7 @@ class Game {
             else if (net.which % 2 == 0)
 
                 interval = setInterval(() => {
-                    this.pill.position.y = reverseParable(this.pill.position.x)
+                    this.pill.position.y = this.reverseParable(this.pill.position.x, startX)
                     this.pill.rotation.z += Math.PI / 75
                     this.pill.position.x++
                     if (this.pill.position.x == startX) {

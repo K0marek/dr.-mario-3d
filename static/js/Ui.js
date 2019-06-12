@@ -2,24 +2,24 @@ console.log("wczytano plik Ui.js")
 
 class Ui {
 
-    constructor() {}
+    constructor() { }
 
     //UTWORZENIE STEROWANIA W GRZE
     controls = () => {
         $(document).on('keydown', e => {
-            if(!game.isPillFlying) {
-                if(game.pillsToFall.length == 0) {
-                    const {pill} = game
-                    const {cellSize} = settings
-                    const {fields} = game.bottle
-                    switch(e.keyCode) {
+            if (!game.isPillFlying) {
+                if (game.pillsToFall.length == 0) {
+                    const { pill } = game
+                    const { cellSize } = settings
+                    const { fields } = game.bottle
+                    switch (e.keyCode) {
                         //Z
                         case 90:
                             pill.positionSet++
-                            if(pill.positionSet == 0) {
+                            if (pill.positionSet == 0) {
                                 pill.rotation.z = Math.PI / 2
                                 pill.position.y -= cellSize
-                                if(!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
+                                if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
                                     pill.position.x -= cellSize
                                     pill.children[0].posX--
                                     pill.children[0].posY--
@@ -28,8 +28,8 @@ class Ui {
                                     pill.children[0].posY--
                                 }
                             }
-                            else if(pill.positionSet == 1) {
-                                if(fields[pill.children[0].posY + 1][pill.children[0].posX].allow) {
+                            else if (pill.positionSet == 1) {
+                                if (fields[pill.children[0].posY + 1][pill.children[0].posX].allow) {
                                     pill.rotation.z = Math.PI
                                     pill.children[1].posX--
                                     pill.children[1].posY++
@@ -37,9 +37,9 @@ class Ui {
                                     pill.positionSet = 0
                                 }
                             }
-                            else if(pill.positionSet == 2) {
-                                if(!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
-                                    if(fields[pill.children[1].posY - 1][pill.children[1].posX - 1].allow) {
+                            else if (pill.positionSet == 2) {
+                                if (!fields[pill.children[1].posY - 1][pill.children[1].posX + 1].allow) {
+                                    if (fields[pill.children[1].posY - 1][pill.children[1].posX - 1].allow) {
                                         pill.rotation.z = Math.PI * 1.5
                                         pill.children[1].posX--
                                         pill.children[1].posY--
@@ -52,8 +52,8 @@ class Ui {
                                     pill.children[1].posY--
                                 }
                             }
-                            else if(pill.positionSet == 3) {
-                                if(fields[pill.children[1].posY + 1][pill.children[1].posX].allow) {
+                            else if (pill.positionSet == 3) {
+                                if (fields[pill.children[1].posY + 1][pill.children[1].posX].allow) {
                                     pill.positionSet = -1
                                     pill.position.x -= cellSize
                                     pill.position.y += cellSize
@@ -77,7 +77,7 @@ class Ui {
                             break
                         //LEFT
                         case 37:
-                            if(game.checkPossibility('-')) {
+                            if (game.checkPossibility('-')) {
                                 pill.position.x -= 20
                                 pill.children.forEach(half => {
                                     half.posX--
@@ -96,7 +96,7 @@ class Ui {
                             break
                         //RIGHT
                         case 39:
-                            if(game.checkPossibility('+')) {
+                            if (game.checkPossibility('+')) {
                                 pill.position.x += 20
                                 pill.children.forEach(half => {
                                     half.posX++
@@ -123,7 +123,7 @@ class Ui {
         })
 
         $(document).on('keyup', e => {
-            switch(e.keyCode) {
+            switch (e.keyCode) {
                 case 40:
                     game.speed = settings.defaultSpeed / net.divisor
                     break
@@ -143,9 +143,10 @@ class Ui {
         })
 
         $('#playButton').on('click', e => {
-            for(let i = 0; i < $("#speedButtons>button").length; i++) {
+            net.nick = $('#nick1p').val()
+            for (let i = 0; i < $("#speedButtons>button").length; i++) {
                 let bt = $("#speedButtons>button")[i]
-                if($(bt).hasClass("btn-danger")) {
+                if ($(bt).hasClass("btn-danger")) {
                     net.divisor = i + 1
                     net.getViruses($("#level").val(), net.divisor, -80, true)
                 }
@@ -239,14 +240,14 @@ class Ui {
 
         $('#playButton2p').on('click', e => {
             let divisor1
-            for(let i = 0; i < $("#speedButtons1p>button").length; i++) {
+            for (let i = 0; i < $("#speedButtons1p>button").length; i++) {
                 let bt = $("#speedButtons1p>button")[i]
-                if($(bt).hasClass("btn-danger"))
+                if ($(bt).hasClass("btn-danger"))
                     divisor1 = i + 1
             }
-            for(let i = 0; i < $("#speedButtons2p>button").length; i++) {
+            for (let i = 0; i < $("#speedButtons2p>button").length; i++) {
                 let bt = $("#speedButtons2p>button")[i]
-                if($(bt).hasClass("btn-danger")) {
+                if ($(bt).hasClass("btn-danger")) {
                     net.client.emit('startGame', {
                         id: net.id,
                         enemy: net.enemy,
@@ -264,12 +265,17 @@ class Ui {
             location.reload()
         })
 
+        $('#checkScores').on('click', e => {
+            net.getScores()
+        })
+
     }
 
     win = () => {
         $('#nickInfo').html(`Gratulację ${net.nick} - wygrałeś!`)
         $('#scoreInfo').html(`Twój wynik to: ${game.score} punktów`)
         $('#win').css('display', 'block')
+        net.addScoreToDB(net.nick, game.score)
     }
 
     lose = () => {

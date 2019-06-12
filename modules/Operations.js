@@ -49,6 +49,13 @@ module.exports = {
             else
                 callback("DELETED")
         })
-    }
+    },
+
+    AddColl: function (db, coll, callback) {
+        db.createCollection(coll, function (err, res) {
+            if (err) console.log(err)
+            else callback({ connected: true })
+        })
+    },
 
 }

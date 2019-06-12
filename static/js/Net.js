@@ -97,17 +97,19 @@ class Net {
             game.scene.add(game.enemyNextPillsContainer)
         })
 
+        this.parable = (x, endX) => -0.03 * Math.pow(x - endX, 2) + 3.7 * (x - endX) + 300
+        this.reverseParable = (x, endX) => -0.03 * Math.pow(x - endX, 2) - 3.7 * (x - endX) + 300
+
         this.client.on('fly', data => {
             const { startX, endX } = data
             game.flyingPill = new Pill(data.color1, data.color2)
             game.flyingPill.position.set(startX, 165, 0)
             game.scene.add(game.flyingPill)
             let interval
-            const parable = x => -0.03 * Math.pow(x - endX, 2) + 3.7 * (x - endX) + 300
-            const reverseParable = x => -0.03 * Math.pow(x - endX, 2) - 3.7 * (x - endX) + 300
+
             if (this.which % 2 == 0)
                 interval = setInterval(() => {
-                    game.flyingPill.position.y = parable(game.flyingPill.position.x)
+                    game.flyingPill.position.y = this.parable(game.flyingPill.position.x, endX)
                     game.flyingPill.rotation.z -= Math.PI / 75
                     game.flyingPill.position.x--
                     if (game.flyingPill.position.x == endX) {
@@ -119,7 +121,7 @@ class Net {
             else if (this.which % 2 == 1)
 
                 interval = setInterval(() => {
-                    game.flyingPill.position.y = reverseParable(game.flyingPill.position.x)
+                    game.flyingPill.position.y = this.reverseParable(game.flyingPill.position.x, endX)
                     game.flyingPill.rotation.z += Math.PI / 75
                     game.flyingPill.position.x++
                     if (game.flyingPill.position.x == endX) {
@@ -407,7 +409,7 @@ class Net {
 
     getViruses = (level, divisor, positionX, start) => {
         $.ajax({
-            url: "http://192.168.2.75:3000/LOAD_LEVEL",
+            url: "/LOAD_LEVEL",
             data: {},
             method: "POST",
             success: function (data) {
@@ -431,6 +433,68 @@ class Net {
             error: function (xhr, status, error) {
                 console.log(xhr)
             }
+        })
+    }
+
+    addScoreToDB = (nick, score) => {
+        $.ajax({
+            url: '/addScore',
+            data: { nick, score },
+            type: 'POST',
+            success: function (data) {
+                const ob = JSON.parse(data)
+                console.log(ob)
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            },
+        })
+    }
+
+    getScores = () => {
+        $.ajax({
+            url: '/getScores',
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                const ob = JSON.parse(data)
+                const { items } = ob
+                const sorted = items.sort((a, b) => {
+                    return b.score - a.score
+                })
+                const table = $('<table>').attr('id', 'scoreTable')
+                const deleteButton = $('<button>')
+                    .attr('id', 'deleteButton')
+                    .html('&times;')
+                    .addClass('close')
+                    .on('click', e => {
+                        table.remove()
+                        e.target.remove()
+                    })
+                $(document.body).append(deleteButton)
+                for (let i = 0; i < 10; i++) {
+                    const tr = $('<tr>')
+                    const td = $('<td>').html(i + 1)
+                    $(tr).append(td)
+                    if (sorted[i] == undefined) {
+                        const tdNick = $('<td>').html('---')
+                        $(tr).append(tdNick)
+                        const tdScore = $('<td>').html('---')
+                        $(tr).append(tdScore)
+                    }
+                    else {
+                        const tdNick = $('<td>').html(sorted[i].nick)
+                        $(tr).append(tdNick)
+                        const tdScore = $('<td>').html(sorted[i].score)
+                        $(tr).append(tdScore)
+                    }
+                    $(table).append(tr)
+                }
+                $(document.body).append(table)
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            },
         })
     }
 }
